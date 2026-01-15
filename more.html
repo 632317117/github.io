@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>更多工具 - 时间网站</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#64748b',
+                        accent: '#f59e0b',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-in': 'slideIn 0.5s ease-in-out',
+                        'pulse-slow': 'pulse 2s infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+            }
+            .glass {
+                @apply bg-white bg-opacity-20 backdrop-blur-lg;
+            }
+        }
+        
+        /* 自定义样式 */
+        .tool-card {
+            min-height: 180px;
+        }
+        
+        .tool-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .tools-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <i class="fa fa-clock-o text-primary text-2xl"></i>
+                    <span class="text-xl font-bold text-dark">时间网站</span>
+                </div>
+                
+                <!-- 桌面导航 -->
+                <div class="hidden md:flex space-x-6">
+                    <a href="index.html" class="text-secondary hover:text-primary transition-colors">世界时钟</a>
+                    <a href="date-calculator.html" class="text-secondary hover:text-primary transition-colors">日期计算器</a>
+                    <a href="countdown.html" class="text-secondary hover:text-primary transition-colors">倒计时</a>
+                    <a href="alarm.html" class="text-secondary hover:text-primary transition-colors">闹钟</a>
+                    <a href="lunar.html" class="text-secondary hover:text-primary transition-colors">农历转换</a>
+                    <a href="more.html" class="text-primary font-medium border-b-2 border-primary">更多工具</a>
+                </div>
+                
+                <!-- 移动端菜单按钮 -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-500 hover:text-primary focus:outline-none">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 移动端导航菜单 -->
+            <div id="mobile-menu" class="md:hidden hidden pt-4 pb-2 animate-fade-in">
+                <div class="flex flex-col space-y-3">
+                    <a href="index.html" class="text-secondary hover:text-primary transition-colors py-2 border-l-4 border-transparent pl-3 hover:border-primary">世界时钟</a>
+                    <a href="date-calculator.html" class="text-secondary hover:text-primary transition-colors py-2 border-l-4 border-transparent pl-3 hover:border-primary">日期计算器</a>
+                    <a href="countdown.html" class="text-secondary hover:text-primary transition-colors py-2 border-l-4 border-transparent pl-3 hover:border-primary">倒计时</a>
+                    <a href="alarm.html" class="text-secondary hover:text-primary transition-colors py-2 border-l-4 border-transparent pl-3 hover:border-primary">闹钟</a>
+                    <a href="lunar.html" class="text-secondary hover:text-primary transition-colors py-2 border-l-4 border-transparent pl-3 hover:border-primary">农历转换</a>
+                    <a href="more.html" class="text-primary font-medium py-2 border-l-4 border-primary pl-3">更多工具</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- 页面标题 -->
+        <section class="mb-12 text-center animate-fade-in">
+            <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-dark mb-4 text-shadow">更多时间工具</h1>
+            <p class="text-lg text-secondary max-w-2xl mx-auto">
+                探索我们提供的更多时间相关工具，满足您的各种时间计算和查询需求。
+            </p>
+        </section>
+
+        <!-- 工具分类 -->
+        <section class="mb-12 animate-slide-in">
+            <div class="bg-white rounded-xl shadow-md p-1 inline-flex">
+                <button class="tool-category px-6 py-3 rounded-lg bg-primary text-white font-medium" data-category="all">
+                    全部工具
+                </button>
+                <button class="tool-category px-6 py-3 rounded-lg text-secondary hover:bg-gray-100 font-medium" data-category="calendar">
+                    日历相关
+                </button>
+                <button class="tool-category px-6 py-3 rounded-lg text-secondary hover:bg-gray-100 font-medium" data-category="calculator">
+                    计算工具
+                </button>
+                <button class="tool-category px-6 py-3 rounded-lg text-secondary hover:bg-gray-100 font-medium" data-category="reference">
+                    参考工具
+                </button>
+            </div>
+        </section>
+
+        <!-- 工具列表 -->
+        <section class="mb-12 animate-slide-in" style="animation-delay: 0.2s;">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 tools-grid">
+                <!-- 黄历 -->
+                <div class="tool-card bg-white rounded-xl shadow-md overflow-hidden card-hover animate-fade-in" data-category="calendar">
+                    <div class="p-6 h-full flex flex-col">
+                        <div class="text-yellow-500 tool-icon">
+                            <i class="fa fa-book"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-dark mb-2">黄历</h3>
+                        <p class="text-secondary mb-4 flex-grow">查看每日黄历信息，包括宜忌、冲煞、吉神方位等传统历法内容。</p>
+                        <button class="open-tool w-full bg-yellow-50 text-yellow-700 py-2 rounded-lg hover:bg-yellow-100 transition-colors" data-tool="huangli">
+                            <i class="fa fa-arrow-right mr-2"></i>使用工具
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 时间戳转换 -->
+                <div class="tool-card bg-white rounded-xl shadow-md overflow-hidden card-hover animate-fade-in" style="animation-delay: 0.1s;" data-category="calculator">
+                    <div class="p-6 h-full flex flex-col">
+                        <div class="text-blue-500 tool-icon">
+                            <i class="fa fa-code"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-dark mb-2">时间戳转换</h3>
+                        <p class="text-secondary mb-4 flex-grow">在Unix时间戳和人类可读日期时间之间进行转换，支持多种格式。</p>
+                        <button class="open-tool w-full bg-blue-50 text-blue-700 py-2 rounded-lg hover:bg-blue-100 transition-colors" data-tool="timestamp">
+                            <i class="fa fa-arrow-right mr-2"></i>使用工具
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 生辰八字 -->
+                <div class="tool-card bg-white rounded-xl shadow-md overflow-hidden card-hover animate-fade-in" style="animation-delay: 0.2s;" data-category="calculator">
+                    <div class="p-6 h-full flex flex-col">
+                        <div class="text-purple-500 tool-icon">
+                            <i class="fa fa-star"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-dark mb-2">生辰八字</h3>
+                        <p class="text-secondary mb-4 flex-grow">根据出生年月日时生成生辰八字，查看命理信息和五行分析。</p>
+                        <button class="open-tool w-full bg-purple-50 text-purple-700 py-2 rounded-lg hover:bg-purple-100 transition-colors" data-tool="birth-chart">
+                            <i class="fa fa-arrow-right mr-2"></i>使用工具
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 时区转换 -->
+                <div class="tool-card bg-white rounded-xl shadow-md overflow-hidden card-hover animate-fade-in" style="animation-delay: 0.3s;" data-category="calculator">
+                    <div class="p-6 h-full flex flex-col">
+                        <div class="text-green-500 tool-icon">
+                            <i class="fa fa-globe"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-dark mb-2">时区转换</h3>
+                        <p class="text-secondary mb-4 flex-grow">在不同时区之间转换时间，查看全球各地的当前时间和日期。</p>
+                        <button class="open-tool w-full bg-green-50 text-green-700 py-2 rounded-lg hover:bg-green-100 transition-colors" data-tool="timezone">
+                            <i class="fa fa-arrow-right mr-2"></i>使用工具
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 预产期计算器 -->
+                <div class="tool-card bg-white rounded-xl shadow-md overflow-hidden card-hover animate-fade-in" style="animation-delay: 0.4s;" data-category="calculator">
+                    <div class="p-6 h-full flex flex-col">
+                        <div class="text-pink-500 tool-icon">
+                            <i class="fa fa-baby-carriage"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-dark mb-2">预产期计算器</h3>
+                        <p class="text-secondary mb-4 flex-grow">根据末次月经日期计算预产期，提供孕期进度和重要里程碑。</p>
+                        <button class="open-tool w-full bg-pink-50 text-pink-700 py-2 rounded-lg hover:bg-pink-100 transition-colors" data-tool="due-date">
+                            <i class="fa fa-arrow-right mr-2"></i>使用工具
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 排卵期计算器 -->
+                <div class="tool-card bg-white rounded-xl shadow-md overflow-hidden card-hover animate-fade-in" style="animation-delay: 0.5s;" data-category="calculator">
+                    <div class="p-6 h-full flex flex-col">
+                        <div class="text-red-500 tool-icon">
+                            <i class="fa fa-heart"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-dark mb-2">排卵期计算器</h3>
+                        <p class="text-secondary mb-4 flex-grow">根据月经周期计算排卵期和安全期，帮助计划生育或避孕。</p>
+                        <button class="open-tool w-full bg-red-50 text-red-700 py-2 rounded-lg hover:bg-red-100 transition-colors" data-tool="ovulation">
+                            <i class="fa fa-arrow-right mr-2"></i>使用工具
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 时辰对照表 -->
+                <div class="tool-card bg-white rounded-xl shadow-md overflow-hidden card-hover animate-fade-in" style="animation-delay: 0.6s;" data-category="reference">
+                    <div class="p-6 h-full flex flex-col">
+                        <div class="text-orange-500 tool-icon">
+                            <i class="fa fa-clock-o"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-dark mb-2">时辰对照表</h3>
+                        <p class="text-secondary mb-4 flex-grow">查看24小时制与传统十二时辰的对应关系，了解每个时辰的特点。</p>
+                        <button class="open-tool w-full bg-orange-50 text-orange-700 py-2 rounded-lg hover:bg-orange-100 transition-colors" data-tool="time-periods">
+                            <i class="fa fa-arrow-right mr-2"></i>使用工具
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 二十四节气表 -->
+                <div class="tool-card bg-white rounded-xl shadow-md overflow-hidden card-hover animate-fade-in" style="animation-delay: 0.7s;" data-category="reference">
+                    <div class="p-6 h-full flex flex-col">
+                        <div class="text-teal-500 tool-icon">
+                            <i class="fa fa-leaf"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-dark mb-2">二十四节气表</h3>
+                        <p class="text-secondary mb-4 flex-grow">查看二十四节气的详细信息，包括日期、含义和传统习俗。</p>
+                        <button class="open-tool w-full bg-teal-50 text-teal-700 py-2 rounded-lg hover:bg-teal-100 transition-colors" data-tool="solar-terms">
+                            <i class="fa fa-arrow-right mr-2"></i>使用工具
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 活了多久 -->
+                <div class="tool-card bg-white rounded-xl shadow-md overflow-hidden card-hover animate-fade-in" style="animation-delay: 0.8s;" data-category="calculator">
+                    <div class="p-6 h-full flex flex-col">
+                        <div class="text-indigo-500 tool-icon">
+                            <i class="fa fa-calendar-check-o"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-dark mb-2">活了多久</h3>
+                        <p class="text-secondary mb-4 flex-grow">计算从出生到现在的精确时间，包括年、月、日、小时、分钟和秒。</p>
+                        <button class="open-tool w-full bg-indigo-50 text-indigo-700 py-2 rounded-lg hover:bg-indigo-100 transition-colors" data-tool="birthday">
+                            <i class="fa fa-arrow-right mr-2"></i>使用工具
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 工作时间计算器 -->
+                <div class="tool-card bg-white rounded-xl shadow-md overflow-hidden card-hover animate-fade-in" style="animation-delay: 0.9s;" data-category="calculator">
+                    <div class="p-6 h-full flex flex-col">
+                        <div class="text-blue-500 tool-icon">
+                            <i class="fa fa-briefcase"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-dark mb-2">工作时间计算器</h3>
+                        <p class="text-secondary mb-4 flex-grow">计算工作时长，支持多个时间段的累加，帮助管理工作时间。</p>
+                        <button class="open-tool w-full bg-blue-50 text-blue-700 py-2 rounded-lg hover:bg-blue-100 transition-colors" data-tool="work-hours">
+                            <i class="fa fa-arrow-right mr-2"></i>使用工具
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 世界时间地图 -->
+                <div class="tool-card bg-white rounded-xl shadow-md overflow-hidden card-hover animate-fade-in" style="animation-delay: 1s;" data-category="reference">
+                    <div class="p-6 h-full flex flex-col">
+                        <div class="text-green-500 tool-icon">
+                            <i class="fa fa-map"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-dark mb-2">世界时间地图</h3>
+                        <p class="text-secondary mb-4 flex-grow">通过交互式地图查看全球各地的当前时间，直观了解时区差异。</p>
+                        <button class="open-tool w-full bg-green-50 text-green-700 py-2 rounded-lg hover:bg-green-100 transition-colors" data-tool="timezone-map">
+                            <i class="fa fa-arrow-right mr-2"></i>使用工具
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 节假日查询 -->
+                <div class="tool-card bg-white rounded-xl shadow-md overflow-hidden card-hover animate-fade-in" style="animation-delay: 1.1s;" data-category="reference">
+                    <div class="p-6 h-full flex flex-col">
+                        <div class="text-red-500 tool-icon">
+                            <i class="fa fa-calendar"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-dark mb-2">节假日查询</h3>
+                        <p class="text-secondary mb-4 flex-grow">查询各国节假日信息，包括法定假日、传统节日和特殊纪念日。</p>
+                        <button class="open-tool w-full bg-red-50 text-red-700 py-2 rounded-lg hover:bg-red-100 transition-colors" data-tool="holidays">
+                            <i class="fa fa-arrow-right mr-2"></i>使用工具
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 工具详情模态框 -->
+        <div id="tool-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+            <div class="bg-white rounded-xl shadow-2xl p-6 md:p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto mx-4 animate-fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 id="modal-title" class="text-2xl font-bold text-dark"></h2>
+                    <button id="close-modal" class="text-gray-400 hover:text-gray-600 focus:outline-none">
+                        <i class="fa fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div id="modal-content">
+                    <!-- 工具内容将通过JS动态生成 -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">时间网站</h3>
+                    <p class="text-gray-400">提供全面的时间相关工具，帮助您更好地管理时间。</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">快速链接</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white transition-colors">世界时钟</a></li>
+                        <li><a href="date-calculator.html" class="hover:text-white transition-colors">日期计算器</a></li>
+                        <li><a href="countdown.html" class="hover:text-white transition-colors">倒计时</a></li>
+                        <li><a href="more.html" class="hover:text-white transition-colors">更多工具</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">联系我们</h3>
+                    <p class="text-gray-400">如有问题或建议，请随时联系我们。</p>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-weixin text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-weibo text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-envelope text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-500">
+                <p>&copy; 2026 时间网站 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 移动端菜单切换
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 工具分类切换
+        document.querySelectorAll('.tool-category').forEach(button => {
+            button.addEventListener('click', function() {
+                const category = this.getAttribute('data-category');
+                
+                // 更新按钮样式
+                document.querySelectorAll('.tool-category').forEach(btn => {
+                    btn.classList.remove('bg-primary', 'text-white');
+                    btn.classList.add('text-secondary', 'hover:bg-gray-100');
+                });
+                
+                this.classList.add('bg-primary', 'text-white');
+                this.classList.remove('text-secondary', 'hover:bg-gray-100');
+                
+                // 筛选工具
+                document.querySelectorAll('.tool-card').forEach(card => {
+                    if (category === 'all' || card.getAttribute('data-category') === category) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+        // 工具数据
+        const toolsData = {
+            huangli: {
+                title: '黄历',
+                content: `
+                    <div class="space-y-6">
+                        <div class="mb-6">
+                            <label class="block text-secondary mb-2 font-medium">选择日期</label>
+                            <div class="flex space-x-3">
+                                <input type="date" id="huangli-date" class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <button id="huangli-today" class="bg-blue-100 text-primary px-4 py-3 rounded-lg hover:bg-blue-200 transition-colors">
+                                    今天
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="huangli-result" class="hidden">
+                            <div class="bg-yellow-50 rounded-xl p-6 mb-6">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-yellow-700 mb-2" id="huangli-date-display"></div>
+                                    <div class="text-lg text-secondary mb-4" id="huangli-lunar-display"></div>
+                                    <div class="grid grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <div class="text-sm text-secondary mb-1">冲煞</div>
+                                            <div class="font-medium text-dark" id="huangli-chongsha"></div>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm text-secondary mb-1">胎神</div>
+                                            <div class="font-medium text-dark" id="huangli-taishen"></div>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <div class="text-sm text-secondary mb-1">五行</div>
+                                            <div class="font-medium text-dark" id="huangli-wuxing"></div>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm text-secondary mb-1">吉神方位</div>
+                                            <div class="font-medium text-dark" id="huangli-jishen"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- 宜 -->
+                                <div>
+                                    <h3 class="text-lg font-bold text-green-700 mb-3">宜</h3>
+                                    <div class="bg-green-50 rounded-lg p-4" id="huangli-yi"></div>
+                                </div>
+                                
+                                <!-- 忌 -->
+                                <div>
+                                    <h3 class="text-lg font-bold text-red-700 mb-3">忌</h3>
+                                    <div class="bg-red-50 rounded-lg p-4" id="huangli-ji"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="huangli-initial" class="text-center py-12">
+                            <div class="text-secondary">
+                                <i class="fa fa-book text-5xl mb-4 opacity-50"></i>
+                                <p>请选择日期查看黄历信息</p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                init: function() {
+                    // 设置默认日期为今天
+                    const today = new Date();
+                    const year = today.getFullYear();
+                    const month = String(today.getMonth() + 1).padStart(2, '0');
+                    const day = String(today.getDate()).padStart(2, '0');
+                    document.getElementById('huangli-date').value = `${year}-${month}-${day}`;
+                    
+                    // 绑定今天按钮
+                    document.getElementById('huangli-today').addEventListener('click', function() {
+                        document.getElementById('huangli-date').value = `${year}-${month}-${day}`;
+                        calculateHuangli();
+                    });
+                    
+                    // 绑定日期变更事件
+                    document.getElementById('huangli-date').addEventListener('change', calculateHuangli);
+                    
+                    // 初始计算
+                    setTimeout(calculateHuangli, 100); // 延迟执行确保DOM已加载完成
+                    
+                    // 黄历计算函数
+                    function calculateHuangli() {
+                        const dateInput = document.getElementById('huangli-date');
+                        if (!dateInput.value) return;
+                        
+                        const date = new Date(dateInput.value);
+                        
+                        // 格式化日期显示
+                        const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+                        document.getElementById('huangli-date-display').textContent = date.toLocaleDateString('zh-CN', dateOptions);
+                        
+                        // 模拟农历日期
+                        document.getElementById('huangli-lunar-display').textContent = `${date.getFullYear()}年正月初一`;
+                        
+                        // 模拟黄历数据
+                        document.getElementById('huangli-chongsha').textContent = '冲鼠(壬子)煞北';
+                        document.getElementById('huangli-taishen').textContent = '仓库碓外东北';
+                        document.getElementById('huangli-wuxing').textContent = '桑柘木';
+                        document.getElementById('huangli-jishen').textContent = '东南';
+                        
+                        // 模拟宜
+                        document.getElementById('huangli-yi').innerHTML = `
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-white px-3 py-1 rounded-full text-green-700 text-sm">嫁娶</span>
+                                <span class="bg-white px-3 py-1 rounded-full text-green-700 text-sm">纳采</span>
+                                <span class="bg-white px-3 py-1 rounded-full text-green-700 text-sm">祭祀</span>
+                                <span class="bg-white px-3 py-1 rounded-full text-green-700 text-sm">祈福</span>
+                                <span class="bg-white px-3 py-1 rounded-full text-green-700 text-sm">出行</span>
+                                <span class="bg-white px-3 py-1 rounded-full text-green-700 text-sm">开市</span>
+                            </div>
+                        `;
+                        
+                        // 模拟忌
+                        document.getElementById('huangli-ji').innerHTML = `
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-white px-3 py-1 rounded-full text-red-700 text-sm">动土</span>
+                                <span class="bg-white px-3 py-1 rounded-full text-red-700 text-sm">安葬</span>
+                                <span class="bg-white px-3 py-1 rounded-full text-red-700 text-sm">修坟</span>
+                                <span class="bg-white px-3 py-1 rounded-full text-red-700 text-sm">安门</span>
+                            </div>
+                        `;
+                        
+                        // 显示结果
+                        document.getElementById('huangli-initial').classList.add('hidden');
+                        document.getElementById('huangli-result').classList.remove('hidden');
+                    }
+                }
+            },
+            timestamp: {
+                title: '时间戳转换',
+                content: `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Unix时间戳转日期 -->
+                        <div>
+                            <h3 class="text-xl font-bold text-dark mb-4">Unix时间戳转日期</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-secondary mb-2 font-medium">Unix时间戳 (秒)</label>
+                                    <div class="flex space-x-3">
+                                        <input type="number" id="timestamp-input" placeholder="输入Unix时间戳" class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <button id="current-timestamp" class="bg-blue-100 text-primary px-4 py-3 rounded-lg hover:bg-blue-200 transition-colors">
+                                            当前时间戳
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <button id="convert-to-date" class="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors">
+                                    <i class="fa fa-exchange mr-2"></i>转换为日期
+                                </button>
+                                
+                                <div id="date-result" class="hidden bg-gray-50 rounded-lg p-4">
+                                    <div class="space-y-2">
+                                        <div>
+                                            <span class="text-secondary">日期时间:</span>
+                                            <span class="ml-2 font-medium text-dark" id="date-display"></span>
+                                        </div>
+                                        <div>
+                                            <span class="text-secondary">ISO格式:</span>
+                                            <span class="ml-2 font-medium text-dark" id="iso-display"></span>
+                                        </div>
+                                        <div>
+                                            <span class="text-secondary">相对时间:</span>
+                                            <span class="ml-2 font-medium text-dark" id="relative-display"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 日期转Unix时间戳 -->
+                        <div>
+                            <h3 class="text-xl font-bold text-dark mb-4">日期转Unix时间戳</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-secondary mb-2 font-medium">选择日期时间</label>
+                                    <input type="datetime-local" id="datetime-input" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                </div>
+                                
+                                <button id="convert-to-timestamp" class="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors">
+                                    <i class="fa fa-exchange mr-2"></i>转换为时间戳
+                                </button>
+                                
+                                <div id="timestamp-result" class="hidden bg-gray-50 rounded-lg p-4">
+                                    <div class="space-y-2">
+                                        <div>
+                                            <span class="text-secondary">Unix时间戳 (秒):</span>
+                                            <span class="ml-2 font-medium text-dark" id="timestamp-display"></span>
+                                        </div>
+                                        <div>
+                                            <span class="text-secondary">Unix时间戳 (毫秒):</span>
+                                            <span class="ml-2 font-medium text-dark" id="timestamp-ms-display"></span>
+                                        </div>
+                                        <div class="pt-2">
+                                            <button id="copy-timestamp" class="bg-blue-100 text-primary px-4 py-2 rounded-lg hover:bg-blue-200 transition-colors">
+                                                <i class="fa fa-copy mr-2"></i>复制时间戳
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                init: function() {
+                    // 设置当前时间戳
+                    document.getElementById('current-timestamp').addEventListener('click', function() {
+                        const now = Math.floor(Date.now() / 1000);
+                        document.getElementById('timestamp-input').value = now;
+                        convertToDate();
+                    });
+                    
+                    // 设置当前日期时间
+                    const now = new Date();
+                    const year = now.getFullYear();
+                    const month = String(now.getMonth() + 1).padStart(2, '0');
+                    const day = String(now.getDate()).padStart(2, '0');
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const minutes = String(now.getMinutes()).padStart(2, '0');
+                    document.getElementById('datetime-input').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+                    
+                    // 绑定转换按钮
+                    document.getElementById('convert-to-date').addEventListener('click', convertToDate);
+                    document.getElementById('convert-to-timestamp').addEventListener('click', convertToTimestamp);
+                    
+                    // 绑定复制按钮
+                    document.getElementById('copy-timestamp').addEventListener('click', function() {
+                        const timestamp = document.getElementById('timestamp-display').textContent;
+                        navigator.clipboard.writeText(timestamp).then(() => {
+                            alert('时间戳已复制到剪贴板');
+                        });
+                    });
+                    
+                    // 时间戳转日期函数
+                    function convertToDate() {
+                        const timestampInput = document.getElementById('timestamp-input');
+                        if (!timestampInput.value) {
+                            alert('请输入Unix时间戳');
+                            return;
+                        }
+                        
+                        const timestamp = parseInt(timestampInput.value);
+                        const date = new Date(timestamp * 1000);
+                        
+                        // 格式化日期显示
+                        document.getElementById('date-display').textContent = date.toLocaleString('zh-CN');
+                        document.getElementById('iso-display').textContent = date.toISOString();
+                        
+                        // 计算相对时间
+                        const now = Date.now();
+                        const diff = now - timestamp * 1000;
+                        const seconds = Math.floor(diff / 1000);
+                        const minutes = Math.floor(seconds / 60);
+                        const hours = Math.floor(minutes / 60);
+                        const days = Math.floor(hours / 24);
+                        
+                        let relativeTime;
+                        if (days > 0) {
+                            relativeTime = `${days}天前`;
+                        } else if (hours > 0) {
+                            relativeTime = `${hours}小时前`;
+                        } else if (minutes > 0) {
+                            relativeTime = `${minutes}分钟前`;
+                        } else {
+                            relativeTime = `${seconds}秒前`;
+                        }
+                        
+                        document.getElementById('relative-display').textContent = relativeTime;
+                        
+                        // 显示结果
+                        document.getElementById('date-result').classList.remove('hidden');
+                    }
+                    
+                    // 日期转时间戳函数
+                    function convertToTimestamp() {
+                        const datetimeInput = document.getElementById('datetime-input');
+                        if (!datetimeInput.value) {
+                            alert('请选择日期时间');
+                            return;
+                        }
+                        
+                        const date = new Date(datetimeInput.value);
+                        const timestamp = Math.floor(date.getTime() / 1000);
+                        const timestampMs = date.getTime();
+                        
+                        // 显示结果
+                        document.getElementById('timestamp-display').textContent = timestamp;
+                        document.getElementById('timestamp-ms-display').textContent = timestampMs;
+                        document.getElementById('timestamp-result').classList.remove('hidden');
+                    }
+                }
+            },
+            'birth-chart': {
+                title: '生辰八字',
+                content: `
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- 出生日期输入 -->
+                            <div>
+                                <h3 class="text-xl font-bold text-dark mb-4">出生信息</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-secondary mb-2 font-medium">出生日期</label>
+                                        <input type="date" id="birth-date" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-secondary mb-2 font-medium">出生时间</label>
+                                        <input type="time" id="birth-time" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-secondary mb-2 font-medium">性别</label>
+                                        <div class="flex space-x-4">
+                                            <button id="gender-male" class="flex-1 bg-primary text-white py-3 rounded-lg font-medium">男</button>
+                                            <button id="gender-female" class="flex-1 bg-gray-100 text-secondary py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors">女</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <button id="calculate-birth-chart" class="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors">
+                                        <i class="fa fa-calculator mr-2"></i>生成生辰八字
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 结果显示 -->
+                            <div>
+                                <h3 class="text-xl font-bold text-dark mb-4">生辰八字</h3>
+                                <div id="birth-chart-result" class="hidden">
+                                    <!-- 八字 -->
+                                    <div class="bg-purple-50 rounded-xl p-6 mb-6">
+                                        <div class="text-center">
+                                            <div class="grid grid-cols-4 gap-2 mb-4">
+                                                <div class="bg-white rounded-lg p-3 text-center">
+                                                    <div class="text-sm text-secondary mb-1">年柱</div>
+                                                    <div class="text-xl font-bold text-purple-700" id="year-stem-branch"></div>
+                                                </div>
+                                                <div class="bg-white rounded-lg p-3 text-center">
+                                                    <div class="text-sm text-secondary mb-1">月柱</div>
+                                                    <div class="text-xl font-bold text-purple-700" id="month-stem-branch"></div>
+                                                </div>
+                                                <div class="bg-white rounded-lg p-3 text-center">
+                                                    <div class="text-sm text-secondary mb-1">日柱</div>
+                                                    <div class="text-xl font-bold text-purple-700" id="day-stem-branch"></div>
+                                                </div>
+                                                <div class="bg-white rounded-lg p-3 text-center">
+                                                    <div class="text-sm text-secondary mb-1">时柱</div>
+                                                    <div class="text-xl font-bold text-purple-700" id="hour-stem-branch"></div>
+                                                </div>
+                                            </div>
+                                            <div class="text-lg text-secondary" id="birth-info"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 五行 -->
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <h4 class="font-medium text-dark mb-3">五行分析</h4>
+                                        <div class="space-y-2 text-sm" id="five-elements"></div>
+                                    </div>
+                                </div>
+                                
+                                <div id="birth-chart-initial" class="h-full flex items-center justify-center">
+                                    <div class="text-center text-secondary">
+                                        <i class="fa fa-star text-5xl mb-4 opacity-50"></i>
+                                        <p>请输入出生信息生成生辰八字</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 命理分析 -->
+                        <div id="命理分析" class="hidden">
+                            <h3 class="text-xl font-bold text-dark mb-4">命理分析</h3>
+                            <div class="bg-gray-50 rounded-lg p-6">
+                                <div class="space-y-4" id="fortune-analysis"></div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                init: function() {
+                    // 设置默认日期为今天
+                    const today = new Date();
+                    const year = today.getFullYear() - 20; // 默认20年前
+                    const month = String(today.getMonth() + 1).padStart(2, '0');
+                    const day = String(today.getDate()).padStart(2, '0');
+                    document.getElementById('birth-date').value = `${year}-${month}-${day}`;
+                    
+                    // 设置默认时间
+                    document.getElementById('birth-time').value = '12:00';
+                    
+                    // 性别选择
+                    let selectedGender = 'male';
+                    document.getElementById('gender-male').addEventListener('click', function() {
+                        selectedGender = 'male';
+                        this.classList.add('bg-primary', 'text-white');
+                        this.classList.remove('bg-gray-100', 'text-secondary', 'hover:bg-gray-200');
+                        
+                        document.getElementById('gender-female').classList.remove('bg-primary', 'text-white');
+                        document.getElementById('gender-female').classList.add('bg-gray-100', 'text-secondary', 'hover:bg-gray-200');
+                    });
+                    
+                    document.getElementById('gender-female').addEventListener('click', function() {
+                        selectedGender = 'female';
+                        this.classList.add('bg-primary', 'text-white');
+                        this.classList.remove('bg-gray-100', 'text-secondary', 'hover:bg-gray-200');
+                        
+                        document.getElementById('gender-male').classList.remove('bg-primary', 'text-white');
+                        document.getElementById('gender-male').classList.add('bg-gray-100', 'text-secondary', 'hover:bg-gray-200');
+                    });
+                    
+                    // 绑定计算按钮
+                    document.getElementById('calculate-birth-chart').addEventListener('click', calculateBirthChart);
+                    
+                    // 生成生辰八字函数
+                    function calculateBirthChart() {
+                        const birthDate = document.getElementById('birth-date').value;
+                        const birthTime = document.getElementById('birth-time').value;
+                        
+                        if (!birthDate || !birthTime) {
+                            alert('请输入完整的出生信息');
+                            return;
+                        }
+                        
+                        const date = new Date(`${birthDate}T${birthTime}`);
+                        
+                        // 模拟八字数据
+                        document.getElementById('year-stem-branch').textContent = '甲子';
+                        document.getElementById('month-stem-branch').textContent = '丙寅';
+                        document.getElementById('day-stem-branch').textContent = '戊辰';
+                        document.getElementById('hour-stem-branch').textContent = '庚申';
+                        
+                        // 出生信息
+                        document.getElementById('birth-info').textContent = `${date.toLocaleDateString('zh-CN')} ${birthTime} ${selectedGender === 'male' ? '男' : '女'}`;
+                        
+                        // 五行分析
+                        document.getElementById('five-elements').innerHTML = `
+                            <div class="flex justify-between">
+                                <span>金:</span>
+                                <div class="w-2/3 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-yellow-500 h-2 rounded-full" style="width: 60%"></div>
+                                </div>
+                                <span class="ml-2">60%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>木:</span>
+                                <div class="w-2/3 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: 40%"></div>
+                                </div>
+                                <span class="ml-2">40%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>水:</span>
+                                <div class="w-2/3 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-500 h-2 rounded-full" style="width: 80%"></div>
+                                </div>
+                                <span class="ml-2">80%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>火:</span>
+                                <div class="w-2/3 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-red-500 h-2 rounded-full" style="width: 30%"></div>
+                                </div>
+                                <span class="ml-2">30%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>土:</span>
+                                <div class="w-2/3 bg-gray-200 rounded-full h-2">
+                                    <div class="bg-yellow-700 h-2 rounded-full" style="width: 50%"></div>
+                                </div>
+                                <span class="ml-2">50%</span>
+                            </div>
+                        `;
+                        
+                        // 命理分析
+                        document.getElementById('fortune-analysis').innerHTML = `
+                            <p class="mb-3">根据您的生辰八字分析，您是一个聪明、有创造力的人，具有领导才能和组织能力。</p>
+                            <p class="mb-3">您的五行中水元素较为旺盛，这意味着您思维敏捷，适应能力强，但可能情绪波动较大。</p>
+                            <p class="mb-3">在事业方面，您适合从事需要创新思维和沟通能力的工作，如管理、教育、艺术等领域。</p>
+                            <p>在人际关系方面，您善于与人交往，但需要注意控制自己的情绪，避免冲动行事。</p>
+                        `;
+                        
+                        // 显示结果
+                        document.getElementById('birth-chart-initial').classList.add('hidden');
+                        document.getElementById('birth-chart-result').classList.remove('hidden');
+                        document.getElementById('命理分析').classList.remove('hidden');
+                    }
+                }
+            },
+            // 其他工具的内容和初始化函数...
+            timezone: {
+                title: '时区转换',
+                content: `
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- 源时区 -->
+                            <div>
+                                <h3 class="text-xl font-bold text-dark mb-4">源时区</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-secondary mb-2 font-medium">选择时区</label>
+                                        <select id="source-timezone" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            <option value="Asia/Shanghai">中国标准时间 (UTC+8)</option>
+                                            <option value="America/New_York">美国东部时间 (UTC-5)</option>
+                                            <option value="America/Los_Angeles">美国西部时间 (UTC-8)</option>
+                                            <option value="Europe/London">格林威治标准时间 (UTC+0)</option>
+                                            <option value="Europe/Paris">欧洲中部时间 (UTC+1)</option>
+                                            <option value="Asia/Tokyo">日本标准时间 (UTC+9)</option>
+                                            <option value="Australia/Sydney">澳大利亚东部时间 (UTC+11)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-secondary mb-2 font-medium">日期时间</label>
+                                        <input type="datetime-local" id="source-datetime" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    </div>
+                                    
+                                    <button id="use-current-time" class="w-full bg-blue-100 text-primary py-3 rounded-lg hover:bg-blue-200 transition-colors">
+                                        <i class="fa fa-clock-o mr-2"></i>使用当前时间
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 目标时区 -->
+                            <div>
+                                <h3 class="text-xl font-bold text-dark mb-4">目标时区</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-secondary mb-2 font-medium">选择时区</label>
+                                        <select id="target-timezone" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            <option value="America/New_York">美国东部时间 (UTC-5)</option>
+                                            <option value="America/Los_Angeles">美国西部时间 (UTC-8)</option>
+                                            <option value="Europe/London">格林威治标准时间 (UTC+0)</option>
+                                            <option value="Europe/Paris">欧洲中部时间 (UTC+1)</option>
+                                            <option value="Asia/Tokyo">日本标准时间 (UTC+9)</option>
+                                            <option value="Australia/Sydney">澳大利亚东部时间 (UTC+11)</option>
+                                            <option value="Asia/Shanghai" selected>中国标准时间 (UTC+8)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <button id="convert-timezone" class="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors">
+                                        <i class="fa fa-exchange mr-2"></i>转换时区
+                                    </button>
+                                    
+                                    <div id="timezone-result" class="hidden bg-gray-50 rounded-lg p-6">
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold text-primary mb-2" id="converted-datetime"></div>
+                                            <div class="text-lg text-secondary" id="timezone-info"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 世界时钟 -->
+                        <div>
+                            <h3 class="text-xl font-bold text-dark mb-4">世界时钟</h3>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4" id="world-clocks">
+                                <!-- 世界时钟将通过JS动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                `,
+                init: function() {
+                    // 设置当前时间
+                    const now = new Date();
+                    const year = now.getFullYear();
+                    const month = String(now.getMonth() + 1).padStart(2, '0');
+                    const day = String(now.getDate()).padStart(2, '0');
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const minutes = String(now.getMinutes()).padStart(2, '0');
+                    document.getElementById('source-datetime').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+                    
+                    // 绑定使用当前时间按钮
+                    document.getElementById('use-current-time').addEventListener('click', function() {
+                        const now = new Date();
+                        const year = now.getFullYear();
+                        const month = String(now.getMonth() + 1).padStart(2, '0');
+                        const day = String(now.getDate()).padStart(2, '0');
+                        const hours = String(now.getHours()).padStart(2, '0');
+                        const minutes = String(now.getMinutes()).padStart(2, '0');
+                        document.getElementById('source-datetime').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+                    });
+                    
+                    // 绑定转换按钮
+                    document.getElementById('convert-timezone').addEventListener('click', convertTimezone);
+                    
+                    // 初始化世界时钟
+                    initWorldClocks();
+                    
+                    // 时区转换函数
+                    function convertTimezone() {
+                        const sourceDatetime = document.getElementById('source-datetime').value;
+                        if (!sourceDatetime) {
+                            alert('请选择源日期时间');
+                            return;
+                        }
+                        
+                        const sourceTimezone = document.getElementById('source-timezone').value;
+                        const targetTimezone = document.getElementById('target-timezone').value;
+                        
+                        // 模拟时区转换（实际应用中需要使用Intl.DateTimeFormat API或第三方库）
+                        const date = new Date(sourceDatetime);
+                        
+                        // 简单的时区偏移计算（简化版）
+                        const timezoneOffsets = {
+                            'Asia/Shanghai': 8,
+                            'America/New_York': -5,
+                            'America/Los_Angeles': -8,
+                            'Europe/London': 0,
+                            'Europe/Paris': 1,
+                            'Asia/Tokyo': 9,
+                            'Australia/Sydney': 11
+                        };
+                        
+                        const sourceOffset = timezoneOffsets[sourceTimezone];
+                        const targetOffset = timezoneOffsets[targetTimezone];
+                        const offsetDiff = targetOffset - sourceOffset;
+                        
+                        const convertedDate = new Date(date.getTime() + offsetDiff * 60 * 60 * 1000);
+                        
+                        // 显示结果
+                        document.getElementById('converted-datetime').textContent = convertedDate.toLocaleString('zh-CN');
+                        document.getElementById('timezone-info').textContent = `${sourceTimezone} → ${targetTimezone}`;
+                        document.getElementById('timezone-result').classList.remove('hidden');
+                    }
+                    
+                    // 初始化世界时钟
+                    function initWorldClocks() {
+                        const worldClocks = document.getElementById('world-clocks');
+                        const timezones = [
+                            { name: '北京', timezone: 'Asia/Shanghai', offset: 8, flag: '🇨🇳' },
+                            { name: '纽约', timezone: 'America/New_York', offset: -5, flag: '🇺🇸' },
+                            { name: '伦敦', timezone: 'Europe/London', offset: 0, flag: '🇬🇧' },
+                            { name: '东京', timezone: 'Asia/Tokyo', offset: 9, flag: '🇯🇵' },
+                            { name: '巴黎', timezone: 'Europe/Paris', offset: 1, flag: '🇫🇷' },
+                            { name: '悉尼', timezone: 'Australia/Sydney', offset: 11, flag: '🇦🇺' },
+                            { name: '洛杉矶', timezone: 'America/Los_Angeles', offset: -8, flag: '🇺🇸' },
+                            { name: '迪拜', timezone: 'Asia/Dubai', offset: 4, flag: '🇦🇪' }
+                        ];
+                        
+                        timezones.forEach((tz, index) => {
+                            const clock = document.createElement('div');
+                            clock.className = 'bg-white rounded-lg shadow p-4 text-center';
+                            
+                            const now = new Date();
+                            const tzTime = new Date(now.getTime() + (tz.offset - 8) * 60 * 60 * 1000); // 北京时间是UTC+8
+                            
+                            clock.innerHTML = `
+                                <div class="text-lg font-bold mb-2">${tz.flag} ${tz.name}</div>
+                                <div class="text-sm text-secondary mb-2">GMT${tz.offset >= 0 ? '+' : ''}${tz.offset}</div>
+                                <div class="text-xl font-mono font-bold text-primary" id="clock-${index}">${tzTime.toLocaleTimeString('zh-CN')}</div>
+                                <div class="text-sm text-secondary">${tzTime.toLocaleDateString('zh-CN')}</div>
+                            `;
+                            
+                            worldClocks.appendChild(clock);
+                        });
+                        
+                        // 更新时钟
+                        function updateClocks() {
+                            const now = new Date();
+                            
+                            timezones.forEach((tz, index) => {
+                                const tzTime = new Date(now.getTime() + (tz.offset - 8) * 60 * 60 * 1000);
+                                const clockElement = document.getElementById(`clock-${index}`);
+                                if (clockElement) {
+                                    clockElement.textContent = tzTime.toLocaleTimeString('zh-CN');
+                                }
+                            });
+                        }
+                        
+                        // 立即更新一次
+                        updateClocks();
+                        
+                        // 设置定时器，每分钟更新一次
+                        setInterval(updateClocks, 60000);
+                    }
+                }
+            },
+            'due-date': {
+                title: '预产期计算器',
+                content: `
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- 输入区域 -->
+                            <div>
+                                <h3 class="text-xl font-bold text-dark mb-4">计算预产期</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-secondary mb-2 font-medium">末次月经日期</label>
+                                        <input type="date" id="last-period" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-secondary mb-2 font-medium">月经周期 (天)</label>
+                                        <input type="number" id="cycle-length" value="28" min="21" max="35" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    </div>
+                                    
+                                    <button id="calculate-due-date" class="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors">
+                                        <i class="fa fa-calculator mr-2"></i>计算预产期
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 结果区域 -->
+                            <div>
+                                <h3 class="text-xl font-bold text-dark mb-4">预产期结果</h3>
+                                <div id="due-date-result" class="hidden">
+                                    <div class="bg-pink-50 rounded-xl p-6 mb-6">
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold text-pink-700 mb-2" id="due-date-display"></div>
+                                            <div class="text-lg text-secondary mb-4" id="due-date-info"></div>
+                                            <div class="text-sm text-secondary">预产期是一个估计日期，实际分娩日期可能会有所不同</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <h4 class="font-medium text-dark mb-3">孕期进度</h4>
+                                        <div class="space-y-2">
+                                            <div>
+                                                <div class="flex justify-between text-sm mb-1">
+                                                    <span>当前孕周:</span>
+                                                    <span class="font-medium" id="current-week"></span>
+                                                </div>
+                                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                                    <div class="bg-pink-500 h-2 rounded-full" id="progress-bar"></div>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-secondary" id="days-remaining"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="due-date-initial" class="h-full flex items-center justify-center">
+                                    <div class="text-center text-secondary">
+                                        <i class="fa fa-baby-carriage text-5xl mb-4 opacity-50"></i>
+                                        <p>请输入末次月经日期计算预产期</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 孕期里程碑 -->
+                        <div id="pregnancy-milestones" class="hidden">
+                            <h3 class="text-xl font-bold text-dark mb-4">孕期里程碑</h3>
+                            <div class="bg-white rounded-lg shadow overflow-hidden">
+                                <div class="divide-y divide-gray-200" id="milestones-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                init: function() {
+                    // 设置默认日期（假设末次月经是4周前）
+                    const fourWeeksAgo = new Date();
+                    fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+                    const year = fourWeeksAgo.getFullYear();
+                    const month = String(fourWeeksAgo.getMonth() + 1).padStart(2, '0');
+                    const day = String(fourWeeksAgo.getDate()).padStart(2, '0');
+                    document.getElementById('last-period').value = `${year}-${month}-${day}`;
+                    
+                    // 绑定计算按钮
+                    document.getElementById('calculate-due-date').addEventListener('click', calculateDueDate);
+                    
+                    // 计算预产期函数
+                    function calculateDueDate() {
+                        const lastPeriod = document.getElementById('last-period').value;
+                        const cycleLength = parseInt(document.getElementById('cycle-length').value) || 28;
+                        
+                        if (!lastPeriod) {
+                            alert('请输入末次月经日期');
+                            return;
+                        }
+                        
+                        const lastPeriodDate = new Date(lastPeriod);
+                        
+                        // 计算预产期（末次月经日期加上280天）
+                        const dueDate = new Date(lastPeriodDate);
+                        dueDate.setDate(dueDate.getDate() + 280);
+                        
+                        // 计算当前孕周
+                        const now = new Date();
+                        const daysSinceLastPeriod = Math.floor((now - lastPeriodDate) / (1000 * 60 * 60 * 24));
+                        const currentWeek = Math.floor(daysSinceLastPeriod / 7) + 1;
+                        const currentDay = daysSinceLastPeriod % 7 + 1;
+                        
+                        // 计算剩余天数
+                        const daysRemaining = Math.floor((dueDate - now) / (1000 * 60 * 60 * 24));
+                        
+                        // 计算进度百分比
+                        const progressPercent = Math.min((daysSinceLastPeriod / 280) * 100, 100);
+                        
+                        // 显示结果
+                        document.getElementById('due-date-display').textContent = dueDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+                        document.getElementById('due-date-info').textContent = `距今还有 ${Math.floor(daysRemaining / 7)} 周 ${daysRemaining % 7} 天`;
+                        document.getElementById('current-week').textContent = `第 ${currentWeek} 周 第 ${currentDay} 天`;
+                        document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+                        document.getElementById('days-remaining').textContent = `已怀孕 ${daysSinceLastPeriod} 天，剩余 ${daysRemaining} 天 (${progressPercent.toFixed(1)}%)`;
+                        
+                        // 生成孕期里程碑
+                        generateMilestones(lastPeriodDate);
+                        
+                        // 显示结果
+                        document.getElementById('due-date-initial').classList.add('hidden');
+                        document.getElementById('due-date-result').classList.remove('hidden');
+                        document.getElementById('pregnancy-milestones').classList.remove('hidden');
+                    }
+                    
+                    // 生成孕期里程碑
+                    function generateMilestones(lastPeriodDate) {
+                        const milestones = [
+                            { week: 4, title: '受精卵着床', description: '受精卵在子宫内壁着床，开始分泌绒毛膜促性腺激素(HCG)' },
+                            { week: 8, title: '胚胎发育', description: '胚胎长约1.6厘米，心脏开始跳动，面部特征开始形成' },
+                            { week: 12, title: '胎儿形成', description: '胎儿长约6.5厘米，所有器官和身体系统已经形成' },
+                            { week: 16, title: '性别确认', description: '通过超声波可能可以确认胎儿性别' },
+                            { week: 20, title: '胎动', description: '大多数孕妇开始感觉到胎动' },
+                            { week: 24, title: '肺部发育', description: '胎儿肺部开始产生表面活性物质，为呼吸做准备' },
+                            { week: 28, title: ' viability', description: '胎儿有存活能力，如果早产，存活几率大大提高' },
+                            { week: 32, title: '体重增加', description: '胎儿开始快速增重，皮下脂肪增加' },
+                            { week: 36, title: '准备出生', description: '胎儿器官功能基本成熟，准备出生' },
+                            { week: 40, title: '预产期', description: '宝宝足月，随时可能出生' }
+                        ];
+                        
+                        const milestonesList = document.getElementById('milestones-list');
+                        milestonesList.innerHTML = '';
+                        
+                        const now = new Date();
+                        
+                        milestones.forEach(milestone => {
+                            const milestoneDate = new Date(lastPeriodDate);
+                            milestoneDate.setDate(milestoneDate.getDate() + milestone.week * 7);
+                            
+                            const isPast = milestoneDate < now;
+                            
+                            const milestoneElement = document.createElement('div');
+                            milestoneElement.className = 'p-4 flex items-center';
+                            
+                            milestoneElement.innerHTML = `
+                                <div class="flex-shrink-0 w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-pink-700 font-bold">
+                                    ${milestone.week}
+                                </div>
+                                <div class="ml-4 flex-grow">
+                                    <div class="flex justify-between items-center">
+                                        <h4 class="font-medium text-dark">${milestone.title}</h4>
+                                        <span class="text-sm ${isPast ? 'text-green-600' : 'text-secondary'}">${milestoneDate.toLocaleDateString('zh-CN')}</span>
+                                    </div>
+                                    <p class="text-sm text-secondary mt-1">${milestone.description}</p>
+                                </div>
+                                <div class="flex-shrink-0">
+                                    <i class="fa ${isPast ? 'fa-check-circle text-green-500' : 'fa-circle-o text-gray-300'} text-xl"></i>
+                                </div>
+                            `;
+                            
+                            milestonesList.appendChild(milestoneElement);
+                        });
+                    }
+                }
+            },
+            // 其他工具的内容和初始化函数...
+            birthday: {
+                title: '活了多久',
+                content: `
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <!-- 输入区域 -->
+                            <div>
+                                <h3 class="text-xl font-bold text-dark mb-4">出生信息</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-secondary mb-2 font-medium">出生日期</label>
+                                        <input type="date" id="birthday-date" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="block text-secondary mb-2 font-medium">出生时间 (可选)</label>
+                                        <input type="time" id="birthday-time" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    </div>
+                                    
+                                    <button id="calculate-age" class="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors">
+                                        <i class="fa fa-calculator mr-2"></i>计算年龄
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 结果区域 -->
+                            <div>
+                                <h3 class="text-xl font-bold text-dark mb-4">您已活了</h3>
+                                <div id="age-result" class="hidden">
+                                    <div class="bg-indigo-50 rounded-xl p-6 mb-6">
+                                        <div class="text-center">
+                                            <div class="text-4xl font-bold text-indigo-700 mb-2" id="total-days"></div>
+                                            <div class="text-lg text-secondary">天</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="bg-white rounded-lg shadow p-4 text-center">
+                                            <div class="text-2xl font-bold text-indigo-700 mb-1" id="age-years"></div>
+                                            <div class="text-sm text-secondary">年</div>
+                                        </div>
+                                        <div class="bg-white rounded-lg shadow p-4 text-center">
+                                            <div class="text-2xl font-bold text-indigo-700 mb-1" id="age-months"></div>
+                                            <div class="text-sm text-secondary">月</div>
+                                        </div>
+                                        <div class="bg-white rounded-lg shadow p-4 text-center">
+                                            <div class="text-2xl font-bold text-indigo-700 mb-1" id="age-weeks"></div>
+                                            <div class="text-sm text-secondary">周</div>
+                                        </div>
+                                        <div class="bg-white rounded-lg shadow p-4 text-center">
+                                            <div class="text-2xl font-bold text-indigo-700 mb-1" id="age-hours"></div>
+                                            <div class="text-sm text-secondary">小时</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div id="age-initial" class="h-full flex items-center justify-center">
+                                    <div class="text-center text-secondary">
+                                        <i class="fa fa-calendar-check-o text-5xl mb-4 opacity-50"></i>
+                                        <p>请输入您的出生日期计算年龄</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 详细统计 -->
+                        <div id="detailed-stats" class="hidden">
+                            <h3 class="text-xl font-bold text-dark mb-4">详细统计</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div class="bg-white rounded-lg shadow p-4">
+                                    <div class="text-sm text-secondary mb-1">分钟</div>
+                                    <div class="text-xl font-bold text-indigo-700" id="age-minutes"></div>
+                                </div>
+                                <div class="bg-white rounded-lg shadow p-4">
+                                    <div class="text-sm text-secondary mb-1">秒</div>
+                                    <div class="text-xl font-bold text-indigo-700" id="age-seconds"></div>
+                                </div>
+                                <div class="bg-white rounded-lg shadow p-4">
+                                    <div class="text-sm text-secondary mb-1">心跳次数 (估计)</div>
+                                    <div class="text-xl font-bold text-indigo-700" id="heartbeats"></div>
+                                </div>
+                                <div class="bg-white rounded-lg shadow p-4">
+                                    <div class="text-sm text-secondary mb-1">呼吸次数 (估计)</div>
+                                    <div class="text-xl font-bold text-indigo-700" id="breaths"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 生命进度 -->
+                        <div id="life-progress" class="hidden">
+                            <h3 class="text-xl font-bold text-dark mb-4">生命进度</h3>
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <div class="space-y-4">
+                                    <div>
+                                        <div class="flex justify-between text-sm mb-1">
+                                            <span>平均寿命进度 (基于75岁):</span>
+                                            <span class="font-medium" id="life-percentage"></span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2">
+                                            <div class="bg-indigo-500 h-2 rounded-full" id="life-progress-bar"></div>
+                                        </div>
+                                    </div>
+                                    <div class="text-sm text-secondary" id="life-expectancy"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                init: function() {
+                    // 设置默认日期（假设是20年前）
+                    const twentyYearsAgo = new Date();
+                    twentyYearsAgo.setFullYear(twentyYearsAgo.getFullYear() - 20);
+                    const year = twentyYearsAgo.getFullYear();
+                    const month = String(twentyYearsAgo.getMonth() + 1).padStart(2, '0');
+                    const day = String(twentyYearsAgo.getDate()).padStart(2, '0');
+                    document.getElementById('birthday-date').value = `${year}-${month}-${day}`;
+                    
+                    // 设置默认时间
+                    document.getElementById('birthday-time').value = '12:00';
+                    
+                    // 绑定计算按钮
+                    document.getElementById('calculate-age').addEventListener('click', calculateAge);
+                    
+                    // 计算年龄函数
+                    function calculateAge() {
+                        const birthdayDate = document.getElementById('birthday-date').value;
+                        const birthdayTime = document.getElementById('birthday-time').value || '00:00';
+                        
+                        if (!birthdayDate) {
+                            alert('请输入出生日期');
+                            return;
+                        }
+                        
+                        const birthDateTime = new Date(`${birthdayDate}T${birthdayTime}`);
+                        const now = new Date();
+                        
+                        if (birthDateTime > now) {
+                            alert('出生日期不能晚于当前时间');
+                            return;
+                        }
+                        
+                        // 计算时间差
+                        const timeDiff = now - birthDateTime;
+                        
+                        // 转换为各种时间单位
+                        const seconds = Math.floor(timeDiff / 1000);
+                        const minutes = Math.floor(seconds / 60);
+                        const hours = Math.floor(minutes / 60);
+                        const days = Math.floor(hours / 24);
+                        const weeks = Math.floor(days / 7);
+                        const months = Math.floor(days / 30.44); // 平均每月天数
+                        const years = Math.floor(days / 365.25); // 平均每年天数
+                        
+                        // 计算剩余的月和天
+                        const remainingMonths = months % 12;
+                        const remainingDays = days % 30.44;
+                        
+                        // 估计的心跳和呼吸次数
+                        const heartbeatsPerMinute = 75;
+                        const breathsPerMinute = 16;
+                        const estimatedHeartbeats = Math.floor(minutes * heartbeatsPerMinute).toLocaleString();
+                        const estimatedBreaths = Math.floor(minutes * breathsPerMinute).toLocaleString();
+                        
+                        // 计算生命进度（基于75岁平均寿命）
+                        const averageLifespan = 75 * 365.25;
+                        const lifePercentage = Math.min((days / averageLifespan) * 100, 100);
+                        const yearsRemaining = Math.floor((averageLifespan - days) / 365.25);
+                        
+                        // 显示结果
+                        document.getElementById('total-days').textContent = days.toLocaleString();
+                        document.getElementById('age-years').textContent = years;
+                        document.getElementById('age-months').textContent = remainingMonths;
+                        document.getElementById('age-weeks').textContent = weeks;
+                        document.getElementById('age-hours').textContent = hours.toLocaleString();
+                        document.getElementById('age-minutes').textContent = minutes.toLocaleString();
+                        document.getElementById('age-seconds').textContent = seconds.toLocaleString();
+                        document.getElementById('heartbeats').textContent = estimatedHeartbeats;
+                        document.getElementById('breaths').textContent = estimatedBreaths;
+                        document.getElementById('life-percentage').textContent = `${lifePercentage.toFixed(1)}%`;
+                        document.getElementById('life-progress-bar').style.width = `${lifePercentage}%`;
+                        document.getElementById('life-expectancy').textContent = `您已度过了人生的 ${lifePercentage.toFixed(1)}%，基于75岁的平均寿命，预计还有约 ${yearsRemaining} 年。`;
+                        
+                        // 显示结果
+                        document.getElementById('age-initial').classList.add('hidden');
+                        document.getElementById('age-result').classList.remove('hidden');
+                        document.getElementById('detailed-stats').classList.remove('hidden');
+                        document.getElementById('life-progress').classList.remove('hidden');
+                    }
+                }
+            }
+        };
+
+        // 打开工具模态框
+        document.querySelectorAll('.open-tool').forEach(button => {
+            button.addEventListener('click', function() {
+                const toolId = this.getAttribute('data-tool');
+                const tool = toolsData[toolId];
+                
+                if (!tool) return;
+                
+                // 设置模态框标题和内容
+                document.getElementById('modal-title').textContent = tool.title;
+                document.getElementById('modal-content').innerHTML = tool.content;
+                
+                // 显示模态框
+                document.getElementById('tool-modal').classList.remove('hidden');
+                
+                // 初始化工具
+                if (tool.init) {
+                    tool.init();
+                }
+                
+                // 滚动到顶部
+                document.getElementById('tool-modal').scrollTop = 0;
+            });
+        });
+
+        // 关闭模态框
+        document.getElementById('close-modal').addEventListener('click', function() {
+            document.getElementById('tool-modal').classList.add('hidden');
+        });
+
+        // 点击模态框背景关闭
+        document.getElementById('tool-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

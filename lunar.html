@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>农历转换 - 时间网站</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#64748b',
+                        accent: '#f59e0b',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-in': 'slideIn 0.5s ease-in-out',
+                        'pulse-slow': 'pulse 2s infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+            }
+            .glass {
+                @apply bg-white bg-opacity-20 backdrop-blur-lg;
+            }
+        }
+        
+        /* 自定义样式 */
+        .lunar-calendar {
+            max-width: 400px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+        }
+        
+        .calendar-day.today {
+            @apply bg-primary text-white;
+        }
+        
+        .calendar-day.other-month {
+            @apply text-gray-300;
+        }
+        
+        .calendar-day.has-lunar {
+            @apply relative;
+        }
+        
+        .calendar-day .lunar-text {
+            @apply absolute bottom-1 right-1 text-[8px] text-gray-500;
+        }
+        
+        .calendar-day .festival-text {
+            @apply absolute top-1 left-1 text-[8px] px-1 rounded whitespace-nowrap overflow-hidden text-ellipsis;
+        }
+        
+        .calendar-day .solar-term {
+            @apply bg-blue-500 text-white;
+        }
+        
+        .calendar-day .lunar-festival {
+            @apply bg-red-500 text-white;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .lunar-calendar {
+                max-width: 100%;
+            }
+            
+            .calendar-day {
+                font-size: 0.875rem;
+            }
+            
+            .calendar-day .lunar-text {
+                font-size: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <i class="fa fa-clock-o text-primary text-2xl"></i>
+                    <span class="text-xl font-bold text-dark">时间网站</span>
+                </div>
+                
+                <!-- 桌面导航 -->
+                <div class="hidden md:flex space-x-6">
+                    <a href="index.html" class="text-secondary hover:text-primary transition-colors">世界时钟</a>
+                    <a href="date-calculator.html" class="text-secondary hover:text-primary transition-colors">日期计算器</a>
+                    <a href="countdown.html" class="text-secondary hover:text-primary transition-colors">倒计时</a>
+                    <a href="lunar.html" class="text-primary font-medium border-b-2 border-primary">农历转换</a>
+                    <a href="more.html" class="text-secondary hover:text-primary transition-colors">更多工具</a>
+                </div>
+                
+                <!-- 移动端菜单按钮 -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-500 hover:text-primary focus:outline-none">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 移动端导航菜单 -->
+            <div id="mobile-menu" class="md:hidden hidden pt-4 pb-2 animate-fade-in">
+                <div class="flex flex-col space-y-3">
+                    <a href="index.html" class="text-secondary hover:text-primary transition-colors py-2 border-l-4 border-transparent pl-3 hover:border-primary">世界时钟</a>
+                    <a href="date-calculator.html" class="text-secondary hover:text-primary transition-colors py-2 border-l-4 border-transparent pl-3 hover:border-primary">日期计算器</a>
+                    <a href="countdown.html" class="text-secondary hover:text-primary transition-colors py-2 border-l-4 border-transparent pl-3 hover:border-primary">倒计时</a>
+                    <a href="lunar.html" class="text-primary font-medium py-2 border-l-4 border-primary pl-3">农历转换</a>
+                    <a href="more.html" class="text-secondary hover:text-primary transition-colors py-2 border-l-4 border-transparent pl-3 hover:border-primary">更多工具</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- 页面标题 -->
+        <section class="mb-12 text-center animate-fade-in">
+            <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-dark mb-4 text-shadow">农历转换</h1>
+            <p class="text-lg text-secondary max-w-2xl mx-auto">
+                在公历和农历日期之间进行转换，查看传统节日和节气信息。
+            </p>
+        </section>
+
+        <!-- 当前日期信息 -->
+        <section class="mb-12 animate-slide-in">
+            <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <!-- 当前日期 -->
+                    <div>
+                        <h2 class="text-2xl font-bold text-dark mb-6">当前日期</h2>
+                        
+                        <div class="space-y-6">
+                            <!-- 公历日期 -->
+                            <div class="bg-blue-50 rounded-xl p-6">
+                                <div class="text-lg text-secondary mb-2">公历</div>
+                                <div class="text-3xl font-bold text-dark" id="current-gregorian"></div>
+                                <div class="text-lg text-secondary mt-2" id="current-weekday"></div>
+                            </div>
+                            
+                            <!-- 农历日期 -->
+                            <div class="bg-red-50 rounded-xl p-6">
+                                <div class="text-lg text-secondary mb-2">农历</div>
+                                <div class="text-3xl font-bold text-red-700" id="current-lunar"></div>
+                                <div class="text-lg text-secondary mt-2" id="current-lunar-festival"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 日期转换 -->
+                    <div>
+                        <h2 class="text-2xl font-bold text-dark mb-6">日期转换</h2>
+                        
+                        <div class="space-y-6">
+                            <!-- 转换选项卡 -->
+                            <div class="bg-gray-100 rounded-lg p-1 inline-flex">
+                                <button id="tab-gregorian-to-lunar" class="px-4 py-2 rounded-md bg-primary text-white font-medium">
+                                    公历转农历
+                                </button>
+                                <button id="tab-lunar-to-gregorian" class="px-4 py-2 rounded-md text-secondary hover:bg-gray-200 font-medium">
+                                    农历转公历
+                                </button>
+                            </div>
+                            
+                            <!-- 公历转农历 -->
+                            <div id="converter-gregorian-to-lunar">
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-secondary mb-2 font-medium">选择公历日期</label>
+                                        <input type="date" id="gregorian-date" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    </div>
+                                    
+                                    <button id="convert-to-lunar" class="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors">
+                                        <i class="fa fa-exchange mr-2"></i>转换为农历
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 农历转公历 -->
+                            <div id="converter-lunar-to-gregorian" class="hidden">
+                                <div class="space-y-4">
+                                    <!-- 农历年份 -->
+                                    <div>
+                                        <label class="block text-secondary mb-2 font-medium">农历年份</label>
+                                        <select id="lunar-year" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            <!-- 年份选项将通过JS动态生成 -->
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- 农历月份 -->
+                                    <div>
+                                        <label class="block text-secondary mb-2 font-medium">农历月份</label>
+                                        <select id="lunar-month" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            <option value="1">正月</option>
+                                            <option value="2">二月</option>
+                                            <option value="3">三月</option>
+                                            <option value="4">四月</option>
+                                            <option value="5">五月</option>
+                                            <option value="6">六月</option>
+                                            <option value="7">七月</option>
+                                            <option value="8">八月</option>
+                                            <option value="9">九月</option>
+                                            <option value="10">十月</option>
+                                            <option value="11">冬月</option>
+                                            <option value="12">腊月</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- 农历日期 -->
+                                    <div>
+                                        <label class="block text-secondary mb-2 font-medium">农历日期</label>
+                                        <select id="lunar-day" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                            <!-- 日期选项将通过JS动态生成 -->
+                                        </select>
+                                    </div>
+                                    
+                                    <button id="convert-to-gregorian" class="w-full bg-primary text-white py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors">
+                                        <i class="fa fa-exchange mr-2"></i>转换为公历
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 转换结果 -->
+        <section id="conversion-result" class="mb-12 hidden animate-fade-in">
+            <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-dark mb-6">转换结果</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- 源日期 -->
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <div class="text-lg text-secondary mb-2" id="source-date-type"></div>
+                        <div class="text-3xl font-bold text-dark" id="source-date"></div>
+                    </div>
+                    
+                    <!-- 目标日期 -->
+                    <div class="bg-blue-50 rounded-xl p-6">
+                        <div class="text-lg text-secondary mb-2" id="target-date-type"></div>
+                        <div class="text-3xl font-bold text-primary" id="target-date"></div>
+                        <div class="text-lg text-secondary mt-2" id="target-date-festival"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 农历日历 -->
+        <section class="mb-12 animate-slide-in" style="animation-delay: 0.2s;">
+            <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-dark mb-6">农历日历</h2>
+                
+                <div class="flex justify-center">
+                    <div class="lunar-calendar w-full">
+                        <!-- 日历头部 -->
+                        <div class="flex justify-between items-center mb-6">
+                            <button id="prev-month" class="px-4 py-2 bg-gray-100 text-secondary rounded-lg hover:bg-gray-200 transition-colors">
+                                <i class="fa fa-chevron-left"></i>
+                            </button>
+                            <h3 id="calendar-title" class="text-xl font-bold text-dark"></h3>
+                            <button id="next-month" class="px-4 py-2 bg-gray-100 text-secondary rounded-lg hover:bg-gray-200 transition-colors">
+                                <i class="fa fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- 星期标题 -->
+                        <div class="grid grid-cols-7 gap-1 mb-2">
+                            <div class="text-center py-2 text-secondary font-medium">日</div>
+                            <div class="text-center py-2 text-secondary font-medium">一</div>
+                            <div class="text-center py-2 text-secondary font-medium">二</div>
+                            <div class="text-center py-2 text-secondary font-medium">三</div>
+                            <div class="text-center py-2 text-secondary font-medium">四</div>
+                            <div class="text-center py-2 text-secondary font-medium">五</div>
+                            <div class="text-center py-2 text-secondary font-medium">六</div>
+                        </div>
+                        
+                        <!-- 日历网格 -->
+                        <div id="calendar-grid" class="grid grid-cols-7 gap-1">
+                            <!-- 日历单元格将通过JS动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 节气与节日 -->
+        <section class="animate-slide-in" style="animation-delay: 0.4s;">
+            <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+                <h2 class="text-2xl font-bold text-dark mb-6">节气与节日</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- 节气 -->
+                    <div>
+                        <h3 class="text-xl font-bold text-dark mb-4">节气</h3>
+                        <div class="space-y-3" id="solar-terms">
+                            <!-- 节气列表将通过JS动态生成 -->
+                        </div>
+                    </div>
+                    
+                    <!-- 节日 -->
+                    <div>
+                        <h3 class="text-xl font-bold text-dark mb-4">传统节日</h3>
+                        <div class="space-y-3" id="traditional-festivals">
+                            <!-- 节日列表将通过JS动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">时间网站</h3>
+                    <p class="text-gray-400">提供全面的时间相关工具，帮助您更好地管理时间。</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">快速链接</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white transition-colors">世界时钟</a></li>
+                        <li><a href="date-calculator.html" class="hover:text-white transition-colors">日期计算器</a></li>
+                        <li><a href="countdown.html" class="hover:text-white transition-colors">倒计时</a></li>
+                        <li><a href="more.html" class="hover:text-white transition-colors">更多工具</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">联系我们</h3>
+                    <p class="text-gray-400">如有问题或建议，请随时联系我们。</p>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-weixin text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-weibo text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-envelope text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-500">
+                <p>&copy; 2026 时间网站 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 移动端菜单切换
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 选项卡切换
+        const tabGregorianToLunar = document.getElementById('tab-gregorian-to-lunar');
+        const tabLunarToGregorian = document.getElementById('tab-lunar-to-gregorian');
+        const converterGregorianToLunar = document.getElementById('converter-gregorian-to-lunar');
+        const converterLunarToGregorian = document.getElementById('converter-lunar-to-gregorian');
+
+        tabGregorianToLunar.addEventListener('click', function() {
+            // 激活当前选项卡
+            tabGregorianToLunar.classList.add('bg-primary', 'text-white');
+            tabGregorianToLunar.classList.remove('text-secondary', 'hover:bg-gray-200');
+            
+            // 取消激活另一个选项卡
+            tabLunarToGregorian.classList.remove('bg-primary', 'text-white');
+            tabLunarToGregorian.classList.add('text-secondary', 'hover:bg-gray-200');
+            
+            // 显示对应的转换器
+            converterGregorianToLunar.classList.remove('hidden');
+            converterLunarToGregorian.classList.add('hidden');
+        });
+
+        tabLunarToGregorian.addEventListener('click', function() {
+            // 激活当前选项卡
+            tabLunarToGregorian.classList.add('bg-primary', 'text-white');
+            tabLunarToGregorian.classList.remove('text-secondary', 'hover:bg-gray-200');
+            
+            // 取消激活另一个选项卡
+            tabGregorianToLunar.classList.remove('bg-primary', 'text-white');
+            tabGregorianToLunar.classList.add('text-secondary', 'hover:bg-gray-200');
+            
+            // 显示对应的转换器
+            converterLunarToGregorian.classList.remove('hidden');
+            converterGregorianToLunar.classList.add('hidden');
+        });
+
+        // 农历转换工具类（简化版，实际应用中需要更复杂的算法）
+        class LunarCalendar {
+            constructor() {
+                // 农历月份名称
+                this.lunarMonths = ['', '正月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '冬月', '腊月'];
+                
+                // 农历日期名称
+                this.lunarDays = ['', '初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十',
+                    '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十',
+                    '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'];
+                
+                // 节气数据（简化版，实际应用中需要更准确的数据）
+                this.solarTerms = [
+                    { name: '立春', month: 2, day: 4 },
+                    { name: '雨水', month: 2, day: 19 },
+                    { name: '惊蛰', month: 3, day: 6 },
+                    { name: '春分', month: 3, day: 21 },
+                    { name: '清明', month: 4, day: 5 },
+                    { name: '谷雨', month: 4, day: 20 },
+                    { name: '立夏', month: 5, day: 6 },
+                    { name: '小满', month: 5, day: 21 },
+                    { name: '芒种', month: 6, day: 6 },
+                    { name: '夏至', month: 6, day: 22 },
+                    { name: '小暑', month: 7, day: 7 },
+                    { name: '大暑', month: 7, day: 23 },
+                    { name: '立秋', month: 8, day: 8 },
+                    { name: '处暑', month: 8, day: 23 },
+                    { name: '白露', month: 9, day: 8 },
+                    { name: '秋分', month: 9, day: 23 },
+                    { name: '寒露', month: 10, day: 8 },
+                    { name: '霜降', month: 10, day: 24 },
+                    { name: '立冬', month: 11, day: 7 },
+                    { name: '小雪', month: 11, day: 22 },
+                    { name: '大雪', month: 12, day: 7 },
+                    { name: '冬至', month: 12, day: 22 },
+                    { name: '小寒', month: 1, day: 6 },
+                    { name: '大寒', month: 1, day: 20 }
+                ];
+                
+                // 传统节日（农历）
+                this.lunarFestivals = [
+                    { name: '春节', month: 1, day: 1 },
+                    { name: '元宵节', month: 1, day: 15 },
+                    { name: '龙抬头', month: 2, day: 2 },
+                    { name: '清明节', month: 3, day: 4 }, // 实际是公历
+                    { name: '端午节', month: 5, day: 5 },
+                    { name: '七夕节', month: 7, day: 7 },
+                    { name: '中元节', month: 7, day: 15 },
+                    { name: '中秋节', month: 8, day: 15 },
+                    { name: '重阳节', month: 9, day: 9 },
+                    { name: '寒衣节', month: 10, day: 1 },
+                    { name: '下元节', month: 10, day: 15 },
+                    { name: '腊八节', month: 12, day: 8 },
+                    { name: '小年', month: 12, day: 23 },
+                    { name: '除夕', month: 12, day: 30 } // 实际是腊月最后一天
+                ];
+            }
+            
+            // 公历转农历（简化版算法）
+            gregorianToLunar(gregorianDate) {
+                // 这里使用简化的算法，实际应用中需要更准确的农历转换算法
+                const year = gregorianDate.getFullYear();
+                const month = gregorianDate.getMonth() + 1;
+                const day = gregorianDate.getDate();
+                
+                // 计算农历年份（简化）
+                let lunarYear = year;
+                if (month < 2 || (month === 2 && day < 4)) {
+                    lunarYear--;
+                }
+                
+                // 计算农历月份（简化）
+                let lunarMonth = month - 1;
+                if (lunarMonth < 1) {
+                    lunarMonth = 12;
+                }
+                
+                // 计算农历日期（简化）
+                let lunarDay = day;
+                
+                // 查找节气
+                const solarTerm = this.getSolarTerm(month, day);
+                
+                // 查找节日
+                const festival = this.getLunarFestival(lunarMonth, lunarDay);
+                
+                return {
+                    year: lunarYear,
+                    month: lunarMonth,
+                    day: lunarDay,
+                    monthName: this.lunarMonths[lunarMonth],
+                    dayName: this.lunarDays[lunarDay],
+                    solarTerm: solarTerm,
+                    festival: festival
+                };
+            }
+            
+            // 农历转公历（简化版算法）
+            lunarToGregorian(lunarYear, lunarMonth, lunarDay) {
+                // 这里使用简化的算法，实际应用中需要更准确的农历转换算法
+                let month = lunarMonth + 1;
+                if (month > 12) {
+                    month = 1;
+                    lunarYear++;
+                }
+                
+                // 估算公历日期
+                let day = lunarDay;
+                
+                // 调整日期（简化）
+                if (lunarMonth === 1 && lunarDay === 1) {
+                    // 春节大约在公历1月底2月初
+                    month = 2;
+                    day = 1;
+                } else if (lunarMonth === 8 && lunarDay === 15) {
+                    // 中秋节大约在公历9月或10月
+                    month = 9;
+                    day = 15;
+                }
+                
+                return new Date(lunarYear, month - 1, day);
+            }
+            
+            // 获取节气
+            getSolarTerm(month, day) {
+                const term = this.solarTerms.find(t => t.month === month && Math.abs(t.day - day) <= 1);
+                return term ? term.name : '';
+            }
+            
+            // 获取农历节日
+            getLunarFestival(lunarMonth, lunarDay) {
+                const festival = this.lunarFestivals.find(f => f.month === lunarMonth && f.day === lunarDay);
+                return festival ? festival.name : '';
+            }
+            
+            // 获取公历节日
+            getGregorianFestival(month, day) {
+                const festivals = {
+                    '1-1': '元旦',
+                    '2-14': '情人节',
+                    '3-8': '妇女节',
+                    '3-12': '植树节',
+                    '4-1': '愚人节',
+                    '5-1': '劳动节',
+                    '5-4': '青年节',
+                    '6-1': '儿童节',
+                    '7-1': '建党节',
+                    '8-1': '建军节',
+                    '9-10': '教师节',
+                    '10-1': '国庆节',
+                    '12-25': '圣诞节'
+                };
+                
+                return festivals[`${month}-${day}`] || '';
+            }
+        }
+
+        // 创建农历日历实例
+        const lunarCalendar = new LunarCalendar();
+
+        // 当前日期
+        let currentDate = new Date();
+        let calendarDate = new Date();
+
+        // 更新当前日期显示
+        function updateCurrentDate() {
+            const now = new Date();
+            
+            // 公历日期
+            const gregorianOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-gregorian').textContent = now.toLocaleDateString('zh-CN', gregorianOptions);
+            
+            // 星期
+            const weekdayOptions = { weekday: 'long' };
+            document.getElementById('current-weekday').textContent = now.toLocaleDateString('zh-CN', weekdayOptions);
+            
+            // 农历日期
+            const lunar = lunarCalendar.gregorianToLunar(now);
+            document.getElementById('current-lunar').textContent = `${lunar.year}年${lunar.monthName}${lunar.dayName}`;
+            
+            // 节气或节日
+            const festival = lunar.festival || lunar.solarTerm;
+            document.getElementById('current-lunar-festival').textContent = festival ? `今天是${festival}` : '';
+        }
+
+        // 设置默认日期
+        function setDefaultDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            document.getElementById('gregorian-date').value = `${year}-${month}-${day}`;
+        }
+
+        // 生成农历年份选项
+        function generateLunarYearOptions() {
+            const yearSelect = document.getElementById('lunar-year');
+            const currentYear = new Date().getFullYear();
+            
+            // 生成前后10年的选项
+            for (let year = currentYear - 10; year <= currentYear + 10; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = `${year}年`;
+                yearSelect.appendChild(option);
+            }
+            
+            // 默认选择当前年份
+            yearSelect.value = currentYear;
+        }
+
+        // 生成农历日期选项
+        function generateLunarDayOptions() {
+            const daySelect = document.getElementById('lunar-day');
+            
+            // 生成1-30天的选项
+            for (let day = 1; day <= 30; day++) {
+                const option = document.createElement('option');
+                option.value = day;
+                option.textContent = lunarCalendar.lunarDays[day];
+                daySelect.appendChild(option);
+            }
+            
+            // 默认选择初一
+            daySelect.value = 1;
+        }
+
+        // 公历转农历
+        document.getElementById('convert-to-lunar').addEventListener('click', function() {
+            const gregorianDateInput = document.getElementById('gregorian-date');
+            
+            if (!gregorianDateInput.value) {
+                alert('请选择公历日期');
+                return;
+            }
+            
+            const gregorianDate = new Date(gregorianDateInput.value);
+            const lunar = lunarCalendar.gregorianToLunar(gregorianDate);
+            
+            // 显示结果
+            document.getElementById('source-date-type').textContent = '公历';
+            document.getElementById('source-date').textContent = gregorianDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+            
+            document.getElementById('target-date-type').textContent = '农历';
+            document.getElementById('target-date').textContent = `${lunar.year}年${lunar.monthName}${lunar.dayName}`;
+            
+            // 节气或节日
+            const festival = lunar.festival || lunar.solarTerm;
+            document.getElementById('target-date-festival').textContent = festival ? `这一天是${festival}` : '';
+            
+            // 显示结果区域
+            document.getElementById('conversion-result').classList.remove('hidden');
+            
+            // 滚动到结果区域
+            document.getElementById('conversion-result').scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+
+        // 农历转公历
+        document.getElementById('convert-to-gregorian').addEventListener('click', function() {
+            const lunarYear = parseInt(document.getElementById('lunar-year').value);
+            const lunarMonth = parseInt(document.getElementById('lunar-month').value);
+            const lunarDay = parseInt(document.getElementById('lunar-day').value);
+            
+            const gregorianDate = lunarCalendar.lunarToGregorian(lunarYear, lunarMonth, lunarDay);
+            const lunar = {
+                year: lunarYear,
+                month: lunarMonth,
+                day: lunarDay,
+                monthName: lunarCalendar.lunarMonths[lunarMonth],
+                dayName: lunarCalendar.lunarDays[lunarDay]
+            };
+            
+            // 显示结果
+            document.getElementById('source-date-type').textContent = '农历';
+            document.getElementById('source-date').textContent = `${lunar.year}年${lunar.monthName}${lunar.dayName}`;
+            
+            document.getElementById('target-date-type').textContent = '公历';
+            document.getElementById('target-date').textContent = gregorianDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+            
+            // 公历节日
+            const festival = lunarCalendar.getGregorianFestival(gregorianDate.getMonth() + 1, gregorianDate.getDate());
+            document.getElementById('target-date-festival').textContent = festival ? `这一天是${festival}` : '';
+            
+            // 显示结果区域
+            document.getElementById('conversion-result').classList.remove('hidden');
+            
+            // 滚动到结果区域
+            document.getElementById('conversion-result').scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+
+        // 更新日历
+        function updateCalendar() {
+            const year = calendarDate.getFullYear();
+            const month = calendarDate.getMonth();
+            
+            // 更新标题
+            document.getElementById('calendar-title').textContent = `${year}年${month + 1}月`;
+            
+            // 获取当月第一天
+            const firstDay = new Date(year, month, 1);
+            
+            // 获取当月最后一天
+            const lastDay = new Date(year, month + 1, 0);
+            
+            // 获取当月第一天是星期几
+            const firstDayWeekday = firstDay.getDay();
+            
+            // 获取当月天数
+            const daysInMonth = lastDay.getDate();
+            
+            // 获取上个月的最后几天
+            const prevMonthLastDay = new Date(year, month, 0).getDate();
+            
+            // 清空日历网格
+            const calendarGrid = document.getElementById('calendar-grid');
+            calendarGrid.innerHTML = '';
+            
+            // 添加上个月的日期
+            for (let i = firstDayWeekday - 1; i >= 0; i--) {
+                const day = prevMonthLastDay - i;
+                const date = new Date(year, month - 1, day);
+                const lunar = lunarCalendar.gregorianToLunar(date);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day other-month flex items-center justify-center rounded-lg';
+                dayElement.innerHTML = `
+                    <div>${day}</div>
+                    <div class="lunar-text">${lunar.dayName.replace('初', '')}</div>
+                `;
+                calendarGrid.appendChild(dayElement);
+            }
+            
+            // 添加当月的日期
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const lunar = lunarCalendar.gregorianToLunar(date);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day flex items-center justify-center rounded-lg hover:bg-blue-50 cursor-pointer';
+                
+                // 如果是今天，添加特殊样式
+                const today = new Date();
+                if (date.toDateString() === today.toDateString()) {
+                    dayElement.classList.add('today');
+                }
+                
+                // 设置为相对定位，以便正确显示绝对定位的元素
+                dayElement.classList.add('has-lunar');
+                
+                // 构建单元格内容
+                let cellContent = `
+                    <div>${day}</div>
+                    <div class="lunar-text">${lunar.dayName.replace('初', '')}</div>
+                `;
+                
+                // 如果有节气或节日，添加显示
+                if (lunar.solarTerm) {
+                    cellContent += `<div class="festival-text solar-term">${lunar.solarTerm}</div>`;
+                } else if (lunar.festival) {
+                    cellContent += `<div class="festival-text lunar-festival">${lunar.festival}</div>`;
+                }
+                
+                dayElement.innerHTML = cellContent;
+                
+                // 添加点击事件
+                dayElement.addEventListener('click', function() {
+                    // 设置选择的日期
+                    document.getElementById('gregorian-date').value = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    
+                    // 切换到公历转农历选项卡
+                    tabGregorianToLunar.click();
+                    
+                    // 滚动到转换器
+                    document.querySelector('.converter-section').scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+                
+                calendarGrid.appendChild(dayElement);
+            }
+            
+            // 计算还需要添加多少天才能填满网格
+            const totalCells = 42; // 6行7列
+            const remainingCells = totalCells - (firstDayWeekday + daysInMonth);
+            
+            // 添加下个月的日期
+            for (let day = 1; day <= remainingCells; day++) {
+                const date = new Date(year, month + 1, day);
+                const lunar = lunarCalendar.gregorianToLunar(date);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day other-month flex items-center justify-center rounded-lg';
+                dayElement.innerHTML = `
+                    <div>${day}</div>
+                    <div class="lunar-text">${lunar.dayName.replace('初', '')}</div>
+                `;
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+
+        // 上个月
+        document.getElementById('prev-month').addEventListener('click', function() {
+            calendarDate.setMonth(calendarDate.getMonth() - 1);
+            updateCalendar();
+        });
+
+        // 下个月
+        document.getElementById('next-month').addEventListener('click', function() {
+            calendarDate.setMonth(calendarDate.getMonth() + 1);
+            updateCalendar();
+        });
+
+        // 更新节气列表
+        function updateSolarTerms() {
+            const container = document.getElementById('solar-terms');
+            container.innerHTML = '';
+            
+            // 按月份排序
+            const sortedTerms = [...lunarCalendar.solarTerms].sort((a, b) => {
+                if (a.month !== b.month) {
+                    return a.month - b.month;
+                }
+                return a.day - b.day;
+            });
+            
+            sortedTerms.forEach(term => {
+                const termElement = document.createElement('div');
+                termElement.className = 'flex justify-between items-center p-3 bg-green-50 rounded-lg';
+                termElement.innerHTML = `
+                    <div class="font-medium text-dark">${term.name}</div>
+                    <div class="text-secondary">${term.month}月${term.day}日</div>
+                `;
+                container.appendChild(termElement);
+            });
+        }
+
+        // 更新传统节日列表
+        function updateTraditionalFestivals() {
+            const container = document.getElementById('traditional-festivals');
+            container.innerHTML = '';
+            
+            // 按月份排序
+            const sortedFestivals = [...lunarCalendar.lunarFestivals].sort((a, b) => {
+                if (a.month !== b.month) {
+                    return a.month - b.month;
+                }
+                return a.day - b.day;
+            });
+            
+            sortedFestivals.forEach(festival => {
+                const festivalElement = document.createElement('div');
+                festivalElement.className = 'flex justify-between items-center p-3 bg-red-50 rounded-lg';
+                festivalElement.innerHTML = `
+                    <div class="font-medium text-dark">${festival.name}</div>
+                    <div class="text-secondary">${lunarCalendar.lunarMonths[festival.month]}${lunarCalendar.lunarDays[festival.day]}</div>
+                `;
+                container.appendChild(festivalElement);
+            });
+        }
+
+        // 初始化
+        function init() {
+            // 更新当前日期
+            updateCurrentDate();
+            
+            // 设置默认日期
+            setDefaultDate();
+            
+            // 生成农历年份和日期选项
+            generateLunarYearOptions();
+            generateLunarDayOptions();
+            
+            // 更新日历
+            updateCalendar();
+            
+            // 更新节气和节日列表
+            updateSolarTerms();
+            updateTraditionalFestivals();
+            
+            // 设置定时器，每分钟更新一次当前日期
+            setInterval(updateCurrentDate, 60000);
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

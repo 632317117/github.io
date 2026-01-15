@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时间网站 - 世界时钟</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#64748b',
+                        accent: '#f59e0b',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-in': 'slideIn 0.5s ease-in-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+            }
+            .glass {
+                @apply bg-white bg-opacity-20 backdrop-blur-lg;
+            }
+        }
+        
+        /* 自定义样式 */
+        .time-display {
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .clock-hand {
+            transform-origin: bottom center;
+            transition: transform 0.5s cubic-bezier(0.1, 2.7, 0.58, 1);
+        }
+        
+        .time-zone-card {
+            height: 180px;
+        }
+        
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .time-zone-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <!-- 导航栏 -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2">
+                    <i class="fa fa-clock-o text-primary text-2xl"></i>
+                    <span class="text-xl font-bold text-dark">时间网站</span>
+                </div>
+                
+                <!-- 桌面导航 -->
+                <div class="hidden md:flex space-x-6">
+                    <a href="index.html" class="text-primary font-medium border-b-2 border-primary">世界时钟</a>
+                    <a href="date-calculator.html" class="text-secondary hover:text-primary transition-colors">日期计算器</a>
+                    <a href="countdown.html" class="text-secondary hover:text-primary transition-colors">倒计时</a>
+                    <a href="lunar.html" class="text-secondary hover:text-primary transition-colors">农历转换</a>
+                    <a href="more.html" class="text-secondary hover:text-primary transition-colors">更多工具</a>
+                </div>
+                
+                <!-- 移动端菜单按钮 -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-500 hover:text-primary focus:outline-none">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 移动端导航菜单 -->
+            <div id="mobile-menu" class="md:hidden hidden pt-4 pb-2 animate-fade-in">
+                <div class="flex flex-col space-y-3">
+                    <a href="index.html" class="text-primary font-medium py-2 border-l-4 border-primary pl-3">世界时钟</a>
+                    <a href="date-calculator.html" class="text-secondary hover:text-primary transition-colors py-2 border-l-4 border-transparent pl-3 hover:border-primary">日期计算器</a>
+                    <a href="countdown.html" class="text-secondary hover:text-primary transition-colors py-2 border-l-4 border-transparent pl-3 hover:border-primary">倒计时</a>
+                    <a href="lunar.html" class="text-secondary hover:text-primary transition-colors py-2 border-l-4 border-transparent pl-3 hover:border-primary">农历转换</a>
+                    <a href="more.html" class="text-secondary hover:text-primary transition-colors py-2 border-l-4 border-transparent pl-3 hover:border-primary">更多工具</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- 当前时间展示 -->
+        <section class="mb-12 text-center animate-fade-in">
+            <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-dark mb-2 text-shadow">现在北京时间</h1>
+            <div class="flex flex-col items-center">
+                <div class="text-[clamp(1.2rem,3vw,1.8rem)] text-secondary mb-4">
+                    <span id="current-date" class="font-medium"></span>
+                </div>
+                <div class="text-[clamp(2.5rem,8vw,5rem)] font-mono font-bold text-primary time-display mb-6">
+                    <span id="current-time"></span>
+                </div>
+                
+                <!-- 模拟时钟 -->
+                <div class="relative w-48 h-48 md:w-64 md:h-64 mb-8 mx-auto">
+                    <div class="absolute inset-0 rounded-full bg-white shadow-lg border-4 border-primary"></div>
+                    
+                    <!-- 时钟刻度 -->
+                    <div class="absolute inset-0">
+                        <div class="h-full w-full flex items-center justify-center">
+                            <div class="w-1 h-8 bg-dark"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- 时针 -->
+                    <div id="hour-hand" class="absolute left-1/2 bottom-1/2 w-4 h-1/2 md:w-5 md:h-1/2 bg-dark rounded-full clock-hand transform -translate-x-1/2 origin-bottom"></div>
+                    
+                    <!-- 分针 -->
+                    <div id="minute-hand" class="absolute left-1/2 bottom-1/2 w-3 h-[65%] md:w-4 md:h-[65%] bg-primary rounded-full clock-hand transform -translate-x-1/2 origin-bottom"></div>
+                    
+                    <!-- 秒针 -->
+                    <div id="second-hand" class="absolute left-1/2 bottom-1/2 w-2 h-[75%] md:w-3 md:h-[75%] bg-accent rounded-full clock-hand transform -translate-x-1/2 origin-bottom"></div>
+                    
+                    <!-- 中心点 -->
+                    <div class="absolute left-1/2 bottom-1/2 w-6 h-6 md:w-8 md:h-8 bg-primary rounded-full transform -translate-x-1/2 -translate-y-1/2 border-4 border-white"></div>
+                </div>
+                
+                <!-- 时区信息 -->
+                <div class="text-secondary text-sm md:text-base max-w-md mx-auto bg-white bg-opacity-70 rounded-lg p-4 shadow">
+                    <p>时区: UTC/GMT +8.00</p>
+                    <p>国家: 中国 China</p>
+                    <p>当前时间比协调世界时(UTC)快8小时</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 世界时钟搜索 -->
+        <section class="mb-12 animate-slide-in">
+            <div class="max-w-2xl mx-auto">
+                <div class="relative">
+                    <input 
+                        type="text" 
+                        id="timezone-search" 
+                        placeholder="搜索城市或国家..." 
+                        class="w-full px-5 py-4 rounded-full shadow-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-lg"
+                    >
+                    <button id="search-button" class="absolute right-3 top-1/2 transform -translate-y-1/2 bg-primary text-white p-2 rounded-full hover:bg-primary/90 transition-colors">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 热门时区 -->
+        <section class="mb-12 animate-slide-in" style="animation-delay: 0.2s;">
+            <h2 class="text-2xl font-bold text-dark mb-6 text-center">热门时区</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 time-zone-grid">
+                <!-- 时区卡片将通过JS动态生成 -->
+            </div>
+        </section>
+
+        <!-- 时间工具导航 -->
+        <section class="mb-12 animate-slide-in" style="animation-delay: 0.4s;">
+            <h2 class="text-2xl font-bold text-dark mb-6 text-center">时间工具</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <a href="date-calculator.html" class="bg-white rounded-xl shadow p-4 text-center card-hover">
+                    <div class="bg-blue-100 text-primary p-3 rounded-full inline-flex mb-3">
+                        <i class="fa fa-calendar text-xl"></i>
+                    </div>
+                    <h3 class="font-medium">日期计算器</h3>
+                </a>
+                <a href="countdown.html" class="bg-white rounded-xl shadow p-4 text-center card-hover">
+                    <div class="bg-green-100 text-green-600 p-3 rounded-full inline-flex mb-3">
+                        <i class="fa fa-hourglass-half text-xl"></i>
+                    </div>
+                    <h3 class="font-medium">倒计时</h3>
+                </a>
+                <a href="alarm.html" class="bg-white rounded-xl shadow p-4 text-center card-hover">
+                    <div class="bg-red-100 text-red-600 p-3 rounded-full inline-flex mb-3">
+                        <i class="fa fa-bell text-xl"></i>
+                    </div>
+                    <h3 class="font-medium">闹钟</h3>
+                </a>
+                <a href="lunar.html" class="bg-white rounded-xl shadow p-4 text-center card-hover">
+                    <div class="bg-purple-100 text-purple-600 p-3 rounded-full inline-flex mb-3">
+                        <i class="fa fa-moon-o text-xl"></i>
+                    </div>
+                    <h3 class="font-medium">农历转换</h3>
+                </a>
+                <a href="huangli.html" class="bg-white rounded-xl shadow p-4 text-center card-hover">
+                    <div class="bg-yellow-100 text-yellow-600 p-3 rounded-full inline-flex mb-3">
+                        <i class="fa fa-book text-xl"></i>
+                    </div>
+                    <h3 class="font-medium">黄历</h3>
+                </a>
+                <a href="timestamp.html" class="bg-white rounded-xl shadow p-4 text-center card-hover">
+                    <div class="bg-gray-100 text-gray-600 p-3 rounded-full inline-flex mb-3">
+                        <i class="fa fa-code text-xl"></i>
+                    </div>
+                    <h3 class="font-medium">时间戳</h3>
+                </a>
+            </div>
+        </section>
+
+        <!-- 深入探索 -->
+        <section class="animate-slide-in" style="animation-delay: 0.6s;">
+            <h2 class="text-2xl font-bold text-dark mb-6 text-center">深入探索</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a href="birthday.html" class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl shadow-lg p-6 card-hover">
+                    <h3 class="text-xl font-bold mb-2">你活了多久</h3>
+                    <p class="opacity-90">计算从出生到现在的精确时间，包括年、月、日、小时和分钟。</p>
+                </a>
+                <a href="timezone-map.html" class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl shadow-lg p-6 card-hover">
+                    <h3 class="text-xl font-bold mb-2">时区地图</h3>
+                    <p class="opacity-90">查看全球时区分布，了解不同地区的当前时间。</p>
+                </a>
+                <a href="birth-chart.html" class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl shadow-lg p-6 card-hover">
+                    <h3 class="text-xl font-bold mb-2">生辰八字</h3>
+                    <p class="opacity-90">根据出生日期和时间生成生辰八字，了解传统命理。</p>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-8 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">时间网站</h3>
+                    <p class="text-gray-400">提供全面的时间相关工具，帮助您更好地管理时间。</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">快速链接</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="index.html" class="hover:text-white transition-colors">世界时钟</a></li>
+                        <li><a href="date-calculator.html" class="hover:text-white transition-colors">日期计算器</a></li>
+                        <li><a href="countdown.html" class="hover:text-white transition-colors">倒计时</a></li>
+                        <li><a href="more.html" class="hover:text-white transition-colors">更多工具</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">联系我们</h3>
+                    <p class="text-gray-400">如有问题或建议，请随时联系我们。</p>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-weixin text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-weibo text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                            <i class="fa fa-envelope text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-6 text-center text-gray-500">
+                <p>&copy; 2026 时间网站 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 时区数据
+        const timezones = [
+            { name: "北京", timezone: "Asia/Shanghai", offset: 8, flag: "🇨🇳" },
+            { name: "纽约", timezone: "America/New_York", offset: -5, flag: "🇺🇸" },
+            { name: "伦敦", timezone: "Europe/London", offset: 0, flag: "🇬🇧" },
+            { name: "东京", timezone: "Asia/Tokyo", offset: 9, flag: "🇯🇵" },
+            { name: "悉尼", timezone: "Australia/Sydney", offset: 11, flag: "🇦🇺" },
+            { name: "巴黎", timezone: "Europe/Paris", offset: 1, flag: "🇫🇷" },
+            { name: "迪拜", timezone: "Asia/Dubai", offset: 4, flag: "🇦🇪" },
+            { name: "洛杉矶", timezone: "America/Los_Angeles", offset: -8, flag: "🇺🇸" },
+            { name: "新加坡", timezone: "Asia/Singapore", offset: 8, flag: "🇸🇬" },
+            { name: "孟买", timezone: "Asia/Kolkata", offset: 5.5, flag: "🇮🇳" },
+            { name: "圣保罗", timezone: "America/Sao_Paulo", offset: -3, flag: "🇧🇷" },
+            { name: "约翰内斯堡", timezone: "Africa/Johannesburg", offset: 2, flag: "🇿🇦" },
+            { name: "曼谷", timezone: "Asia/Bangkok", offset: 7, flag: "🇹🇭" },
+            { name: "吉隆坡", timezone: "Asia/Kuala_Lumpur", offset: 8, flag: "🇲🇾" },
+            { name: "雅加达", timezone: "Asia/Jakarta", offset: 7, flag: "🇮🇩" },
+            { name: "温哥华", timezone: "America/Vancouver", offset: -8, flag: "🇨🇦" },
+            { name: "多伦多", timezone: "America/Toronto", offset: -5, flag: "🇨🇦" },
+            { name: "芝加哥", timezone: "America/Chicago", offset: -6, flag: "🇺🇸" },
+            { name: "柏林", timezone: "Europe/Berlin", offset: 1, flag: "🇩🇪" },
+            { name: "罗马", timezone: "Europe/Rome", offset: 1, flag: "🇮🇹" },
+            { name: "马德里", timezone: "Europe/Madrid", offset: 1, flag: "🇪🇸" },
+            { name: "开罗", timezone: "Africa/Cairo", offset: 2, flag: "🇪🇬" },
+            { name: "奥克兰", timezone: "Pacific/Auckland", offset: 13, flag: "🇳🇿" }
+        ];
+
+        // 移动端菜单切换
+        document.getElementById('mobile-menu-button').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 更新当前时间
+        function updateCurrentTime() {
+            const now = new Date();
+            
+            // 更新日期
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('zh-CN', options);
+            
+            // 更新时间
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            document.getElementById('current-time').textContent = now.toLocaleTimeString('zh-CN', timeOptions);
+            
+            // 更新时钟指针
+            updateClockHands(now);
+        }
+
+        // 更新时钟指针
+        function updateClockHands(date) {
+            const seconds = date.getSeconds();
+            const minutes = date.getMinutes();
+            const hours = date.getHours();
+            
+            // 计算旋转角度
+            const secondDegree = (seconds / 60) * 360;
+            const minuteDegree = (minutes / 60) * 360 + (seconds / 60) * 6;
+            const hourDegree = (hours / 12) * 360 + (minutes / 60) * 30;
+            
+            // 应用旋转
+            document.getElementById('second-hand').style.transform = `translateX(-50%) rotate(${secondDegree}deg)`;
+            document.getElementById('minute-hand').style.transform = `translateX(-50%) rotate(${minuteDegree}deg)`;
+            document.getElementById('hour-hand').style.transform = `translateX(-50%) rotate(${hourDegree}deg)`;
+        }
+
+        // 生成时区卡片
+        function generateTimezoneCards() {
+            const container = document.querySelector('.time-zone-grid');
+            container.innerHTML = '';
+            
+            timezones.forEach((tz, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow-md overflow-hidden card-hover time-zone-card animate-fade-in';
+                card.style.animationDelay = `${0.1 * index}s`;
+                
+                // 创建卡片内容
+                card.innerHTML = `
+                    <div class="p-5 h-full flex flex-col">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-bold text-lg">${tz.flag} ${tz.name}</h3>
+                            <span class="text-sm text-secondary">GMT${tz.offset >= 0 ? '+' : ''}${tz.offset}</span>
+                        </div>
+                        <div class="text-2xl font-mono font-bold text-primary mb-2 timezone-time" data-offset="${tz.offset}">--:--:--</div>
+                        <div class="text-sm text-secondary mt-auto">
+                            <span class="timezone-date">----年--月--日</span>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+            
+            // 初始更新所有时区时间
+            updateAllTimezones();
+        }
+
+        // 更新所有时区时间
+        function updateAllTimezones() {
+            const now = new Date();
+            
+            document.querySelectorAll('.timezone-time').forEach(element => {
+                const offset = parseFloat(element.getAttribute('data-offset'));
+                const tzTime = new Date(now.getTime() + (offset - 8) * 60 * 60 * 1000); // 北京时间是GMT+8
+                
+                // 更新时间
+                const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+                element.textContent = tzTime.toLocaleTimeString('zh-CN', timeOptions);
+                
+                // 更新日期
+                const dateElement = element.nextElementSibling.querySelector('.timezone-date');
+                const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+                dateElement.textContent = tzTime.toLocaleDateString('zh-CN', dateOptions);
+            });
+        }
+
+        // 搜索时区
+        document.getElementById('search-button').addEventListener('click', searchTimezone);
+        document.getElementById('timezone-search').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchTimezone();
+            }
+        });
+
+        function searchTimezone() {
+            const searchTerm = document.getElementById('timezone-search').value.trim().toLowerCase();
+            
+            if (!searchTerm) return;
+            
+            // 简单搜索逻辑
+            const results = timezones.filter(tz => 
+                tz.name.toLowerCase().includes(searchTerm)
+            );
+            
+            if (results.length > 0) {
+                // 显示结果
+                const container = document.querySelector('.time-zone-grid');
+                container.innerHTML = '';
+                
+                results.forEach((tz, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-white rounded-xl shadow-md overflow-hidden card-hover time-zone-card animate-fade-in';
+                    card.style.animationDelay = `${0.1 * index}s`;
+                    
+                    card.innerHTML = `
+                        <div class="p-5 h-full flex flex-col">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="font-bold text-lg">${tz.flag} ${tz.name}</h3>
+                                <span class="text-sm text-secondary">GMT${tz.offset >= 0 ? '+' : ''}${tz.offset}</span>
+                            </div>
+                            <div class="text-2xl font-mono font-bold text-primary mb-2 timezone-time" data-offset="${tz.offset}">--:--:--</div>
+                            <div class="text-sm text-secondary mt-auto">
+                                <span class="timezone-date">----年--月--日</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    container.appendChild(card);
+                });
+                
+                // 更新时间
+                updateAllTimezones();
+            } else {
+                alert('未找到匹配的城市或国家');
+            }
+        }
+
+        // 初始化
+        function init() {
+            // 立即更新一次时间
+            updateCurrentTime();
+            generateTimezoneCards();
+            
+            // 设置定时器，每秒更新一次
+            setInterval(() => {
+                updateCurrentTime();
+                updateAllTimezones();
+            }, 1000);
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
